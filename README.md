@@ -1,2 +1,31 @@
 # -Esprit-PW-2A24-2026-Eco-Basket
 This project was developed as part of the PW – 2nd Year Engineering Program at Esprit School of Engineering – Tunisia (Academic Year 2025–2026). Technologies: JavaScript, PHP, HTML.
+
+# Eco-Basket – Farm-to-Table Marketplace
+
+## Overview
+This project was developed as part of the **PW – 2nd Year Engineering Program** at **Esprit School of Engineering – Tunisia** (Academic Year 2025–2026).
+
+**Eco-Basket** is a web platform that directly connects local organic farmers with urban consumers. By eliminating intermediaries, the platform aims to reduce carbon footprint, promote sustainable agriculture, and provide consumers with fresh, organic products at fair prices.
+
+## Features
+- **User Authentication** – Sign up / Login for farmers and consumers
+- **Product Listings** – Farmers can add, edit, and manage their organic products
+- **Product Catalog** – Consumers can browse products by category, price, and location
+- **Shopping Cart** – Add products to cart and place orders
+- **Order Management** – Farmers can view and update order status
+- **Search & Filter** – Search products by name, category, or farmer location
+- **Responsive Design** – Mobile-friendly interface
+
+## Tech Stack
+
+### Frontend
+- HTML5
+- CSS3 (with Flexbox/Grid for responsive layout)
+- JavaScript (Vanilla JS for interactivity)
+
+### Backend
+- PHP (Server-side logic and API endpoints)
+- MySQL (Database for users, products, orders)
+
+## Architecture
