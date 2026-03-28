@@ -20,12 +20,32 @@ This project was developed as part of the **PW – 2nd Year Engineering Program*
 ## Tech Stack
 
 ### Frontend
-- HTML5
-- CSS3 (with Flexbox/Grid for responsive layout)
-- JavaScript (Vanilla JS for interactivity)
+- HTML
+- JavaScript
 
 ### Backend
-- PHP (Server-side logic and API endpoints)
-- MySQL (Database for users, products, orders)
-
+- PHP 
+- MySQL 
 ## Architecture
+┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│ Browser │────▶│ PHP │────▶│ MySQL │
+│(Frontend) │◀────│(Backend)│◀────│(Database)│
+└─────────────┘ └─────────────┘ └─────────────┘
+
+## Contributors
+- Zaineb Hidoussi
+- Abdelmajid Bejaoui
+- Youssef Zaghouan
+- Abdelkarim Abdelaziz
+- DhiaEddine Lamouchi
+- Malek Ben Mohammed
+## Academic Context
+Developed at **Esprit School of Engineering – Tunisia**  
+PW – 2nd Year | Academic Year 2025–2026
+
+## Getting Started
+(...)
+
+## Acknowledgments
+(...)
+
