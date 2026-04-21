@@ -1,15 +1,18 @@
 <?php
+require_once __DIR__ . '/partials/auth.php';
 require_once __DIR__ . '/../../Controller/UserC.php';
 require_once __DIR__ . '/../../Model/User.php';
+
+if (frontofficeIsLoggedIn()) {
+    header('Location: updateUser.php');
+    exit;
+}
 
 $userC = new UserC();
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $_POST['role'] = 'client';
-    $_POST['statut_compte'] = $_POST['statut_compte'] ?? '1';
-
-    $errors = $userC->validateUserData($_POST, true);
+    $errors = $userC->validateRegistrationData($_POST);
 
     if (empty($errors)) {
         $user = new User(
@@ -19,12 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['password'],
             'client',
             trim($_POST['preference_alimentaire']),
-            trim($_POST['date_inscription']),
-            (int) $_POST['statut_compte']
+            date('Y-m-d H:i:s'),
+            1
         );
 
         $userC->insertUser($user);
-        header('Location: listUsers.php');
+        header('Location: login.php?created=1');
         exit;
     }
 }
@@ -32,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $pageTitle = 'Inscription';
 $heroTitle = 'Create Your Athlete Profile';
 $heroSubtitle = 'Rejoignez la communaute NutriSmart';
-$activePage = 'add';
+$activePage = 'signup';
 require_once __DIR__ . '/partials/layout_top.php';
 ?>
 
@@ -72,18 +75,8 @@ require_once __DIR__ . '/partials/layout_top.php';
                         <input class="form-control" type="text" name="preference_alimentaire" value="<?php echo htmlspecialchars($_POST['preference_alimentaire'] ?? ''); ?>">
                     </div>
 
-                    <div class="form-group">
-                        <label>Date inscription (YYYY-MM-DD HH:MM:SS)</label>
-                        <input class="form-control" type="text" name="date_inscription" value="<?php echo htmlspecialchars($_POST['date_inscription'] ?? date('Y-m-d H:i:s')); ?>">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Statut compte (1 actif, 0 inactif)</label>
-                        <input class="form-control" type="text" name="statut_compte" value="<?php echo htmlspecialchars($_POST['statut_compte'] ?? '1'); ?>">
-                    </div>
-
                     <button type="submit" class="btn btn-vege">S'inscrire</button>
-                    <a href="listUsers.php" class="btn btn-outline-secondary">Retour</a>
+                    <a href="login.php" class="btn btn-outline-secondary">J'ai deja un compte</a>
                 </form>
             </div>
         </div>

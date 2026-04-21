@@ -1,14 +1,15 @@
 <?php
+require_once __DIR__ . '/partials/auth.php';
 require_once __DIR__ . '/../../Controller/UserC.php';
 require_once __DIR__ . '/../../Model/User.php';
 
+frontofficeRequireLogin();
+
 $userC = new UserC();
 $errors = [];
+$successMessage = '';
 
-$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
-if ($id <= 0) {
-    die('ID invalide.');
-}
+$id = (int) $_SESSION['front_user_id'];
 
 $currentUser = $userC->getUserById($id);
 if (!$currentUser) {
@@ -16,9 +17,8 @@ if (!$currentUser) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $_POST['role'] = 'client';
-    $passwordRequired = !empty($_POST['password']);
-    $errors = $userC->validateUserData($_POST, $passwordRequired);
+    $passwordRequired = trim($_POST['password'] ?? '') !== '';
+    $errors = $userC->validateProfileData($_POST, $passwordRequired, $id);
 
     if (empty($errors)) {
         $user = new User(
@@ -28,13 +28,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['password'] ?? '',
             'client',
             trim($_POST['preference_alimentaire']),
-            trim($_POST['date_inscription']),
-            (int) $_POST['statut_compte']
+            $currentUser['date_inscription'],
+            (int) $currentUser['statut_compte']
         );
 
         $userC->updateUser($user, $id, $passwordRequired);
-        header('Location: listUsers.php');
-        exit;
+        $_SESSION['front_user_nom'] = trim($_POST['nom']);
+        $_SESSION['front_user_email'] = trim($_POST['email']);
+        $successMessage = 'Profil mis a jour avec succes.';
+        $currentUser = $userC->getUserById($id);
     }
 }
 
@@ -43,7 +45,7 @@ $data = $_POST ?: $currentUser;
 $pageTitle = 'Modifier profil';
 $heroTitle = 'Update Your Profile';
 $heroSubtitle = 'Gardez vos informations a jour';
-$activePage = 'list';
+$activePage = 'profile';
 require_once __DIR__ . '/partials/layout_top.php';
 ?>
 
@@ -52,6 +54,10 @@ require_once __DIR__ . '/partials/layout_top.php';
         <div class="card card-vege">
             <div class="card-header">Modifier le compte #<?php echo (int) $id; ?></div>
             <div class="card-body">
+                <?php if ($successMessage !== ''): ?>
+                    <div class="alert alert-success"><?php echo htmlspecialchars($successMessage); ?></div>
+                <?php endif; ?>
+
                 <?php if (!empty($errors)): ?>
                     <div class="alert alert-danger">
                         <ul class="mb-0">
@@ -83,18 +89,14 @@ require_once __DIR__ . '/partials/layout_top.php';
                         <input class="form-control" type="text" name="preference_alimentaire" value="<?php echo htmlspecialchars($data['preference_alimentaire'] ?? ''); ?>">
                     </div>
 
-                    <div class="form-group">
-                        <label>Date inscription (YYYY-MM-DD HH:MM:SS)</label>
-                        <input class="form-control" type="text" name="date_inscription" value="<?php echo htmlspecialchars($data['date_inscription'] ?? date('Y-m-d H:i:s')); ?>">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Statut compte (1 actif, 0 inactif)</label>
-                        <input class="form-control" type="text" name="statut_compte" value="<?php echo htmlspecialchars((string) ($data['statut_compte'] ?? '1')); ?>">
-                    </div>
-
                     <button type="submit" class="btn btn-vege">Mettre a jour</button>
-                    <a href="listUsers.php" class="btn btn-outline-secondary">Retour</a>
+                    <a href="listUsers.php" class="btn btn-outline-secondary">Retour accueil</a>
+                </form>
+
+                <hr>
+                <form method="POST" action="deleteUser.php" onsubmit="return confirm('Voulez-vous vraiment supprimer votre compte ?');">
+                    <button type="submit" class="btn btn-outline-danger">Supprimer mon compte</button>
+                    <a href="logout.php" class="btn btn-outline-dark ml-2">Se deconnecter</a>
                 </form>
             </div>
         </div>

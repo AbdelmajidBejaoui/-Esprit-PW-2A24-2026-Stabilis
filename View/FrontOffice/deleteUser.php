@@ -1,12 +1,18 @@
 <?php
+require_once __DIR__ . '/partials/auth.php';
 require_once __DIR__ . '/../../Controller/UserC.php';
 
-$userC = new UserC();
-$id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+frontofficeRequireLogin();
 
-if ($id > 0) {
+$userC = new UserC();
+$id = (int) $_SESSION['front_user_id'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $id > 0) {
     $userC->deleteUser($id);
+    frontofficeLogout();
+    header('Location: login.php?deleted=1');
+    exit;
 }
 
-header('Location: listUsers.php');
+header('Location: updateUser.php');
 exit;

@@ -1,59 +1,52 @@
 <?php
+require_once __DIR__ . '/partials/auth.php';
 require_once __DIR__ . '/../../Controller/UserC.php';
 
-$userC = new UserC();
-$allUsers = $userC->listUsers();
-
-$users = array_filter($allUsers, function ($u) {
-    return (int) $u['statut_compte'] === 1;
-});
+$loggedUser = null;
+if (frontofficeIsLoggedIn()) {
+    $userC = new UserC();
+    $loggedUser = $userC->getUserById((int) $_SESSION['front_user_id']);
+}
 
 $pageTitle = 'FrontOffice';
-$heroTitle = 'Athlete Community';
-$heroSubtitle = 'Profils actifs de la plateforme';
-$activePage = 'list';
+$heroTitle = 'Smart Nutrition Journey';
+$heroSubtitle = 'Connectez-vous pour gerer votre profil nutritionnel';
+$activePage = 'home';
 require_once __DIR__ . '/partials/layout_top.php';
 ?>
 
-<div class="card card-vege">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <span>Utilisateurs actifs</span>
-        <a href="addUser.php" class="btn btn-sm btn-vege">Creer un compte</a>
-    </div>
-    <div class="table-responsive">
-        <table class="table mb-0">
-            <thead class="thead-vege">
-                <tr>
-                    <th>ID</th>
-                    <th>Nom</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Preference alimentaire</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (!empty($users)): ?>
-                    <?php foreach ($users as $u): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($u['id']); ?></td>
-                            <td><?php echo htmlspecialchars($u['nom']); ?></td>
-                            <td><?php echo htmlspecialchars($u['email']); ?></td>
-                            <td><span class="pill-role"><?php echo htmlspecialchars($u['role']); ?></span></td>
-                            <td><?php echo htmlspecialchars($u['preference_alimentaire']); ?></td>
-                            <td>
-                                <a href="updateUser.php?id=<?php echo (int) $u['id']; ?>" class="btn btn-outline-secondary btn-sm">Modifier</a>
-                                <a href="deleteUser.php?id=<?php echo (int) $u['id']; ?>" class="btn btn-outline-danger btn-sm" onclick="return confirm('Supprimer ce compte ?');">Supprimer</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
+<div class="row">
+    <div class="col-lg-7 mb-4">
+        <div class="card card-vege h-100">
+            <div class="card-header">Espace Client</div>
+            <div class="card-body">
+                <h4 class="mb-3">Gestion de compte</h4>
+                <p class="mb-4">Inscription, connexion et mise a jour du profil utilisateur.</p>
+                <?php if (frontofficeIsLoggedIn()): ?>
+                    <a href="updateUser.php" class="btn btn-vege mr-2">Mon profil</a>
+                    <a href="logout.php" class="btn btn-outline-secondary">Se deconnecter</a>
                 <?php else: ?>
-                    <tr>
-                        <td colspan="6" class="text-center py-4">Aucun utilisateur actif.</td>
-                    </tr>
+                    <a href="login.php" class="btn btn-vege mr-2">Se connecter</a>
+                    <a href="addUser.php" class="btn btn-outline-secondary">Creer un compte</a>
                 <?php endif; ?>
-            </tbody>
-        </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5 mb-4">
+        <div class="card card-vege h-100">
+            <div class="card-header">Statut du compte</div>
+            <div class="card-body">
+                <?php if ($loggedUser): ?>
+                    <p><strong>Nom:</strong> <?php echo htmlspecialchars($loggedUser['nom']); ?></p>
+                    <p><strong>Email:</strong> <?php echo htmlspecialchars($loggedUser['email']); ?></p>
+                    <p><strong>Preference:</strong> <?php echo htmlspecialchars($loggedUser['preference_alimentaire']); ?></p>
+                    <p class="mb-0"><strong>Compte:</strong> <span class="pill-role">Connecte</span></p>
+                <?php else: ?>
+                    <p>Vous n'etes pas connecte actuellement.</p>
+                    <p class="mb-0">Connectez-vous pour acceder a votre profil et gerer vos informations personnelles.</p>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 </div>
 

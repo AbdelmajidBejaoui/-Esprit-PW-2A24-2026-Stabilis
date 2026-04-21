@@ -9,8 +9,14 @@ if (!isset($heroSubtitle)) {
     $heroSubtitle = 'Gestion des profils';
 }
 if (!isset($activePage)) {
-    $activePage = 'list';
+    $activePage = 'home';
 }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$isLoggedIn = isset($_SESSION['front_user_id']);
+$loggedUserName = $_SESSION['front_user_nom'] ?? 'Athlete';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -123,7 +129,11 @@ if (!isset($activePage)) {
     <div class="top-banner">
         <div class="container d-flex justify-content-between">
             <span><i class="fa-solid fa-dumbbell mr-1"></i> NutriSmart for Athletes</span>
-            <span><i class="fa-solid fa-leaf mr-1"></i> Nutrition personalisee et objectifs sportifs</span>
+            <?php if ($isLoggedIn): ?>
+                <span><i class="fa-solid fa-user mr-1"></i> Bonjour <?php echo htmlspecialchars($loggedUserName); ?></span>
+            <?php else: ?>
+                <span><i class="fa-solid fa-leaf mr-1"></i> Nutrition personnalisee et objectifs sportifs</span>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -136,12 +146,24 @@ if (!isset($activePage)) {
 
             <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item <?php echo $activePage === 'list' ? 'active' : ''; ?>">
-                        <a class="nav-link" href="listUsers.php">Communaute</a>
+                    <li class="nav-item <?php echo $activePage === 'home' ? 'active' : ''; ?>">
+                        <a class="nav-link" href="listUsers.php">Accueil</a>
                     </li>
-                    <li class="nav-item <?php echo $activePage === 'add' ? 'active' : ''; ?>">
-                        <a class="nav-link" href="addUser.php">Inscription</a>
-                    </li>
+                    <?php if ($isLoggedIn): ?>
+                        <li class="nav-item <?php echo $activePage === 'profile' ? 'active' : ''; ?>">
+                            <a class="nav-link" href="updateUser.php">Mon profil</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="logout.php">Deconnexion</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item <?php echo $activePage === 'login' ? 'active' : ''; ?>">
+                            <a class="nav-link" href="login.php">Connexion</a>
+                        </li>
+                        <li class="nav-item <?php echo $activePage === 'signup' ? 'active' : ''; ?>">
+                            <a class="nav-link" href="addUser.php">Inscription</a>
+                        </li>
+                    <?php endif; ?>
                     <li class="nav-item">
                         <a class="nav-link" href="../BackOffice/listUsers.php">BackOffice</a>
                     </li>
