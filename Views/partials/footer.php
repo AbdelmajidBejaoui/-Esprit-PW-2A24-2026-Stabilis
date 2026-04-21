@@ -1,93 +1,48 @@
-            </div>
-        </div>
-    </div>
-    
-    <footer class="main-footer">
-        <strong>&copy; <?php echo date('Y'); ?> Sport Nutrition Store - All Rights Reserved.</strong>
-    </footer>
 </div>
 
-<script src="/AdminLTE3/plugins/jquery/jquery.min.js"></script>
-<script src="/AdminLTE3/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="/AdminLTE3/dist/js/adminlte.min.js"></script>
+<div class="main-footer">
+    <i class="fas fa-seedling"></i> Stabilis™ — synchronisation métabolique & empreinte contrôlée
+    <br>
+    <small>&copy; <?php echo date('Y'); ?> - Tous droits réservés</small>
+</div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-// Fonction pour afficher des notifications toast
 function showToast(message, type) {
     const toast = document.createElement('div');
     toast.className = `toast-notification ${type}`;
     toast.innerHTML = message;
     document.body.appendChild(toast);
-    
     setTimeout(() => {
-        toast.style.animation = 'slideOutRight 0.5s ease-out';
-        setTimeout(() => {
-            toast.remove();
-        }, 500);
+        toast.style.animation = 'slideOutRight 0.4s ease-out';
+        setTimeout(() => toast.remove(), 400);
     }, 3000);
 }
 
-// Animation au chargement de la page
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("Animations chargées !");
+    document.querySelectorAll('.form-card, .table-card, .stat-card').forEach((el, i) => {
+        el.classList.add('animate-fade-slide');
+        el.style.animationDelay = (i * 0.05) + 's';
+    });
     
-    // Vérifier les paramètres URL pour les notifications
+    document.querySelectorAll('table tbody tr').forEach((row, i) => {
+        row.classList.add('table-row');
+        row.style.animationDelay = (i * 0.03) + 's';
+    });
+    
+    document.querySelectorAll('.badge').forEach(badge => {
+        const text = badge.textContent;
+        const match = text.match(/(\d+)/);
+        if(match && parseInt(match[0]) < 5 && parseInt(match[0]) > 0) {
+            badge.classList.add('badge-stock-low');
+        }
+    });
+    
     const urlParams = new URLSearchParams(window.location.search);
-    if(urlParams.get('success') === '1') {
-        showToast('✅ Opération réussie !', 'success');
-    } else if(urlParams.get('deleted') === '1') {
-        showToast('🗑️ Suppression effectuée !', 'info');
-    } else if(urlParams.get('updated') === '1') {
-        showToast('✏️ Modification réussie !', 'success');
-    } else if(urlParams.get('error') === '1') {
-        showToast('❌ Une erreur est survenue', 'error');
-    }
-    
-    // Animation pour les messages d'erreur
-    const errorMessages = document.querySelectorAll('.error-message');
-    errorMessages.forEach(msg => {
-        if(msg.textContent !== '') {
-            const input = msg.previousElementSibling;
-            if(input) {
-                input.classList.add('input-error');
-                setTimeout(() => {
-                    input.classList.remove('input-error');
-                }, 500);
-            }
-        }
-    });
-});
-
-// Animation de confirmation pour les formulaires
-document.querySelectorAll('form').forEach(form => {
-    form.addEventListener('submit', function(e) {
-        const btn = this.querySelector('button[type="submit"]');
-        if(btn) {
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="loading-spinner"></span> Chargement...';
-            btn.disabled = true;
-        }
-    });
-});
-
-// Animation au survol des lignes du tableau
-document.querySelectorAll('table tbody tr').forEach(row => {
-    row.addEventListener('mouseenter', function() {
-        this.style.transition = 'all 0.2s ease';
-        this.style.backgroundColor = '#f5f5f5';
-    });
-    row.addEventListener('mouseleave', function() {
-        this.style.backgroundColor = '';
-    });
+    if(urlParams.get('success') === '1') showToast(' Opération réussie !', 'success');
+    else if(urlParams.get('deleted') === '1') showToast(' Suppression effectuée', 'info');
+    else if(urlParams.get('updated') === '1') showToast(' Modification réussie', 'success');
 });
 </script>
-
-<style>
-/* Animation hover pour les lignes du tableau */
-table tbody tr {
-    transition: all 0.2s ease;
-}
-</style>
-
 </body>
 </html>

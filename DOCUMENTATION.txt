@@ -1,0 +1,1016 @@
+================================================================================
+                    STABILIS™ PROJECT DOCUMENTATION
+                    Complete Code Explanation & Guide
+================================================================================
+Created: April 2026
+Project: E-commerce Platform for Sports Nutrition
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+1. PROJECT OVERVIEW
+2. ARCHITECTURE & STRUCTURE
+3. FRONT-END SYSTEM (Customer Side)
+4. BACK-END SYSTEM (Admin Panel)
+5. CORE FUNCTIONS & HOW THEY WORK
+6. DATABASE STRUCTURE
+7. STYLING & DESIGN SYSTEM
+8. HOW TO ADD NEW FEATURES
+9. COMMON WORKFLOWS
+
+
+================================================================================
+1. PROJECT OVERVIEW
+================================================================================
+
+Stabilis™ is a full-stack e-commerce platform for sports nutrition products.
+It features:
+- Customer-facing shop with product browsing, filtering, cart, and checkout
+- Admin panel for product management (CRUD operations)
+- Session-based shopping cart
+- Responsive design with modern CSS
+- Easy switching between front-office and back-office
+
+Technology Stack:
+- PHP 7+ (Backend)
+- MySQL/PDO (Database)
+- HTML5/CSS3 (Frontend)
+- JavaScript (Client-side interactions)
+- XAMPP (Local development)
+
+
+================================================================================
+2. ARCHITECTURE & STRUCTURE
+================================================================================
+
+Directory Layout:
+---------
+AdminLTE3/
+├── index.php                    # Dashboard entry point
+├── Views/
+│   ├── front/                   # Customer-facing pages
+│   │   ├── index.php            # Homepage
+│   │   ├── shop.php             # Product listing & filtering
+│   │   ├── product.php          # Single product detail
+│   │   ├── cart.php             # Shopping cart
+│   │   └── checkout.php         # Order checkout page
+│   ├── back/                    # Admin pages
+│   │   └── produits/
+│   │       ├── liste.php        # Product list table
+│   │       ├── ajout.php        # Add new product form
+│   │       ├── modifier.php     # Edit product form
+│   │       └── supprimer.php    # Delete product action
+│   └── partials/
+│       ├── header.php           # Shared navigation & styles
+│       └── footer.php           # Shared footer
+├── controllers/
+│   └── ProduitController.php    # All product logic (CRUD, search, filters)
+├── models/
+│   └── Produit.php              # Product class definition
+├── config/
+│   └── database.php             # Database connection
+├── assets/
+│   └── css/
+│       ├── stabilis.css         # Design system (variables, base styles)
+│       └── front-style.css      # Front-end page-specific styles
+└── dist/
+    └── img/                     # Product images
+
+
+Design Pattern: MVC (Model-View-Controller)
+-------------------------------------------
+Models: Define data structure (Produit.php)
+Controllers: Handle business logic (ProduitController.php)
+Views: Display UI (HTML pages in Views/)
+
+
+================================================================================
+3. FRONT-END SYSTEM (Customer Side)
+================================================================================
+
+A. HOMEPAGE (Views/front/index.php)
+-----------------------------------
+Purpose: Landing page showcasing featured products
+Key Features:
+- Hero section with call-to-action
+- Featured product grid (first 4 products)
+- Navigation bar with shop & cart links
+- Admin access button
+
+Flow:
+1. User lands on index.php
+2. PHP loads first 4 products via ProduitController::getAll()
+3. Page displays hero section + products
+4. User can click to shop or add products to cart
+
+Key Code:
+    $featured = array_slice($produits, 0, 4);  // Get first 4 products
+
+
+B. SHOP PAGE (Views/front/shop.php)
+-----------------------------------
+Purpose: Browse all products with search & filter capabilities
+Key Features:
+- Full product listing with pagination-ready grid
+- Filter by category dropdown
+- Search by product name
+- Sort options (relevant, price up, price down, A-Z)
+- Cart badge showing item count
+- Results counter
+
+How to Use:
+1. User visits shop.php
+2. Can filter by: search text, category
+3. Creates GET request with ?search=keyword&category=value
+4. ProduitController::getAll() processes filters
+5. Results displayed in responsive grid
+
+Key Functions:
+    $produits = $controller->getAll($search, $category);
+    - Searches both nom and categorie fields
+    - Returns filtered product list
+    
+    $categories = $controller->getCategories();
+    - Gets all distinct categories from database
+    - Used to populate filter dropdown
+
+HTML/Form Used:
+    <form method="GET" class="filters-container">
+        <input type="text" name="search">
+        <select name="category">
+            <!-- categories populated by PHP loop -->
+        </select>
+    </form>
+
+
+C. PRODUCT DETAIL PAGE (Views/front/product.php)
+------------------------------------------------
+Purpose: Show single product with description, stock, and add-to-cart
+Key Features:
+- Product image, price, description
+- Stock indicator (in stock / out of stock)
+- Quantity selector with +/- buttons
+- Add to cart button
+- Back to shop button
+- Breadcrumb navigation
+
+How It Works:
+1. User clicks "Voir" or "View" on a product card from shop/home
+2. URL: product.php?id=5 (product ID from GET parameter)
+3. PHP code:
+    $id = $_GET['id'] ?? null;
+    $product = $controller->getById($id);
+    if(!$product) redirect to shop.php
+4. Product details display
+5. User selects quantity using +/- buttons
+6. JavaScript handles quantity changes:
+    function changeQuantity(delta) { ... }
+7. User submits form to cart.php
+
+Key Form:
+    <form method="POST" action="cart.php">
+        <input type="hidden" name="action" value="add">
+        <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+        <input type="number" name="quantity" value="1">
+        <button type="submit">Add to Cart</button>
+    </form>
+
+
+D. SHOPPING CART (Views/front/cart.php)
+---------------------------------------
+Purpose: Manage items in cart, update quantities, proceed to checkout
+Key Features:
+- List all items in cart with images, prices
+- Update quantity for each item
+- Remove items from cart
+- Cart total calculation
+- Proceed to checkout button
+- Continue shopping button
+
+Session Management:
+    $_SESSION['cart'][$product_id] = quantity;
+    Example: $_SESSION['cart'][5] = 2;  // Product ID 5, Quantity 2
+
+Cart Operations (POST actions):
+1. ADD: $_POST['action'] = 'add'
+   $_SESSION['cart'][$product_id] += $quantity;
+
+2. UPDATE: $_POST['action'] = 'update'
+   $_SESSION['cart'][$product_id] = $quantity;
+   (If quantity 0, item removed)
+
+3. REMOVE: $_POST['action'] = 'remove'
+   unset($_SESSION['cart'][$product_id]);
+
+Key Code Example:
+    if($action === 'add' && $productId > 0) {
+        $_SESSION['cart'][$productId] = ($_SESSION['cart'][$productId] ?? 0) + $quantity;
+    }
+
+Display Cart:
+    $products = $controller->getByIds(array_keys($cart));
+    foreach($products as $product) {
+        $quantity = $cart[$product['id']];
+        $subtotal = $product['prix'] * $quantity;
+    }
+
+
+E. CHECKOUT PAGE (Views/front/checkout.php)
+--------------------------------------------
+Purpose: Final order form and order completion page
+Key Features:
+- Customer information form (name, email, address, etc.)
+- Order summary with total
+- Place order button
+- Success message after order
+
+Order Processing:
+1. User fills checkout form
+2. Submits POST request
+3. PHP clears cart: $_SESSION['cart'] = [];
+4. Sets success flag: $orderComplete = true;
+5. Display success message
+
+Key Code:
+    if($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $_SESSION['cart'] = [];  // Clear cart
+        $orderComplete = true;   // Show success page
+    }
+
+
+================================================================================
+4. BACK-END SYSTEM (Admin Panel)
+================================================================================
+
+A. DASHBOARD & NAVIGATION (Views/partials/header.php)
+-----------------------------------------------------
+Purpose: Admin navigation and layout wrapper
+Features:
+- Sidebar with navigation menu
+- Links to dashboard, product list, add product
+- Link to front-office for testing
+- Consistent header for all admin pages
+
+Sidebar Menu:
+    ├── Dashboard (index.php)
+    ├── Produits → Liste (product list)
+    ├── Produits → Nouveau produit (add product)
+    └── Front Office (link to shop.php for testing)
+
+
+B. PRODUCT LIST TABLE (Views/back/produits/liste.php)
+------------------------------------------------------
+Purpose: Display all products in a table with edit/delete actions
+Key Features:
+- Table with product data (name, category, price, stock, image)
+- Search functionality
+- Edit button for each product
+- Delete button for each product
+- Add new product button
+- Stock warning indicator (low stock highlighted)
+
+How to Use:
+1. Use search box to find products by name/text
+2. Click "Éditer" (Edit) to modify a product
+3. Click delete icon to remove a product
+4. Click "Ajouter un produit" to add new
+
+Functions Used:
+    $produits = $controller->getAll($search);
+    - Loads all products (optionally filtered by search)
+
+
+C. ADD PRODUCT FORM (Views/back/produits/ajout.php)
+---------------------------------------------------
+Purpose: Create new product entry
+Form Fields:
+- Nom (Product name) - Required, min 3 chars
+- Prix (Price €) - Required, must be positive
+- Description - Detailed product info
+- Stock - Initial stock quantity
+- Catégorie - Choose from: Protéines, Acides Aminés, Pré-workout, Vitamines, Snacks, Accessoires
+- Image - JPG/PNG/WEBP file upload
+
+Validation:
+1. Client-side: JavaScript validates in real-time
+   - Name length check
+   - Price > 0 check
+   - Stock >= 0 check
+   - Category selected
+
+2. Server-side: ProduitController::validateData()
+   - Re-validates all fields
+   - Checks for required fields
+
+File Upload:
+    $upload = $controller->saveImage($_FILES['image']);
+    - Saves image to /dist/img/
+    - Returns filename or error
+
+Creating Product:
+    $produit = new Produit(
+        $nom,              // String
+        $prix,             // Float
+        $description,      // String
+        $stock,            // Integer
+        $categorie,        // String
+        $image_url         // String (filename)
+    );
+    $controller->add($produit);  // Save to database
+
+
+D. EDIT PRODUCT FORM (Views/back/produits/modifier.php)
+--------------------------------------------------------
+Purpose: Update existing product data
+How to Use:
+1. Click "Éditer" on any product in liste.php
+2. Form pre-fills with current product data
+3. Modify any fields
+4. Click "Enregistrer" to save
+
+Key Difference from Add:
+    - Loads existing product: $controller->getById($id);
+    - Image upload is optional (keeps current if not changed)
+    - Updates instead of inserts: $controller->update($id, $produit);
+
+Code Flow:
+    $product = $controller->getById($id);  // Load existing
+    if(uploaded new image) {
+        $values['image_url'] = $upload;
+    } else {
+        $values['image_url'] = $product['image_url'];  // Keep old
+    }
+    $controller->update($id, $produit);
+
+
+E. DELETE PRODUCT (Views/back/produits/supprimer.php)
+-----------------------------------------------------
+Purpose: Remove product from database
+How to Use:
+1. Click delete icon on any product
+2. Automatic redirect to supprimer.php?id=5
+3. Deletes product ID 5
+4. Redirects back to liste.php with success message
+
+Code:
+    if(isset($_GET['id'])) {
+        $controller->delete($_GET['id']);
+        header('Location: liste.php?deleted=1');
+    }
+
+
+Loading States:
+    When user clicks submit buttons, they show loading spinner:
+    - Button text changes to "Chargement..." with spinner
+    - Button becomes disabled to prevent double-clicks
+    - Spinner uses CSS animation
+
+
+================================================================================
+5. CORE FUNCTIONS & HOW THEY WORK
+================================================================================
+
+A. ProduitController Class (controllers/ProduitController.php)
+--------------------------------------------------------------
+
+1. __construct()
+   Purpose: Initialize database connection
+   Code: $this->pdo = Database::getConnection();
+   Usage: $controller = new ProduitController(); // Automatically called
+
+2. getById($id)
+   Purpose: Get single product by ID
+   Parameters: $id (integer)
+   Returns: Array with product data or false
+   Usage Example:
+       $product = $controller->getById(5);
+       echo $product['nom'];  // Outputs product name
+
+3. getByIds(array $ids)
+   Purpose: Get multiple products by array of IDs
+   Parameters: $ids (array of integers)
+   Returns: Array of product arrays
+   Usage Example:
+       $cart = [5 => 2, 10 => 1];  // ID => Quantity
+       $products = $controller->getByIds(array_keys($cart));  // Get product data
+       foreach($products as $product) { ... }
+
+4. getCategories()
+   Purpose: Get all unique product categories
+   Returns: Array of category names
+   Usage Example:
+       $categories = $controller->getCategories();
+       // Returns: ['Protéines', 'Acides Aminés', 'Pré-workout', ...]
+       foreach($categories as $cat) {
+           echo "<option>$cat</option>";
+       }
+
+5. getAll($search = '', $category = '')
+   Purpose: Get all products with optional filtering
+   Parameters:
+       - $search (string): Search term to match in name or category
+       - $category (string): Filter by exact category
+   Returns: Array of product arrays
+   Usage Examples:
+       // Get all products
+       $all = $controller->getAll();
+       
+       // Search for "protein"
+       $results = $controller->getAll('protein');
+       
+       // Filter by category
+       $vitams = $controller->getAll('', 'Vitamines');
+       
+       // Both search AND filter
+       $specific = $controller->getAll('whey', 'Protéines');
+
+6. add(Produit $produit)
+   Purpose: Insert new product into database
+   Parameters: $produit (Produit object)
+   Returns: Boolean (true if successful)
+   Usage Example:
+       $produit = new Produit(
+           'Whey Protein',
+           49.99,
+           'Description here',
+           100,
+           'Protéines',
+           'whey-protein.jpg'
+       );
+       if($controller->add($produit)) {
+           echo "Product added!";
+       }
+
+7. update($id, Produit $produit)
+   Purpose: Update existing product
+   Parameters: $id (integer), $produit (Produit object)
+   Returns: Boolean (true if successful)
+   Usage Example:
+       $produit = new Produit('Updated Name', 59.99, ...);
+       $controller->update(5, $produit);
+
+8. delete($id)
+   Purpose: Delete product from database
+   Parameters: $id (integer)
+   Returns: Boolean (true if successful)
+   Usage Example:
+       $controller->delete(5);  // Deletes product with ID 5
+
+9. validateData(&$data, &$errors)
+   Purpose: Validate product data before saving
+   Checks:
+       - Name length >= 3
+       - Price > 0
+       - Stock >= 0
+       - Category selected
+       - Image file type (JPG/PNG/WEBP)
+   Usage Example:
+       $errors = [];
+       if($controller->validateData($values, $errors)) {
+           // OK to save
+       } else {
+           // Show errors
+           foreach($errors as $field => $msg) {
+               echo $msg;
+           }
+       }
+
+10. saveImage(array $file)
+    Purpose: Upload and validate image file
+    Parameters: $_FILES['image'] array
+    Returns: Filename string, false on error, null if no file
+    Usage Example:
+        $filename = $controller->saveImage($_FILES['image']);
+        if($filename === false) {
+            $errors['image'] = 'Invalid image format';
+        } elseif($filename !== null) {
+            $values['image_url'] = $filename;
+        }
+
+
+B. Produit Model Class (models/Produit.php)
+--------------------------------------------
+
+Purpose: Define product data structure
+Constructor:
+    public function __construct($nom, $prix, $description, $stock, $categorie, $image_url)
+
+Properties:
+    - $nom: Product name (string)
+    - $prix: Price in euros (float)
+    - $description: Product description (string)
+    - $stock: Available quantity (integer)
+    - $categorie: Product category (string)
+    - $image_url: Image filename (string)
+
+Usage:
+    $produit = new Produit(
+        'Product Name',
+        29.99,
+        'Great product',
+        50,
+        'Protéines',
+        'product.jpg'
+    );
+
+
+C. Database Class (config/database.php)
+----------------------------------------
+
+Purpose: Singleton database connection
+Usage:
+    $pdo = Database::getConnection();
+    $stmt = $pdo->prepare("SELECT * FROM produits");
+
+
+================================================================================
+6. DATABASE STRUCTURE
+================================================================================
+
+Table: produits
+---------
+Column          Type            Description
+------          ----            -----------
+id              INT             Primary key, auto-increment
+nom             VARCHAR(255)    Product name
+description     TEXT            Product description
+prix            DECIMAL(10,2)   Price in euros
+stock           INT             Available quantity
+categorie       VARCHAR(100)    Product category
+image_url       VARCHAR(255)    Path to product image
+created_at      TIMESTAMP       When product was added
+updated_at      TIMESTAMP       When product was last updated
+
+Example SQL:
+    CREATE TABLE produits (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        nom VARCHAR(255) NOT NULL,
+        description TEXT,
+        prix DECIMAL(10,2) NOT NULL,
+        stock INT DEFAULT 0,
+        categorie VARCHAR(100),
+        image_url VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );
+
+
+================================================================================
+7. STYLING & DESIGN SYSTEM
+================================================================================
+
+A. CSS Variables (assets/css/stabilis.css)
+-------------------------------------------
+
+Color System:
+    --bg-primary: Main background
+    --bg-elevated: Cards/containers background
+    --bg-surface: Subtle background for sections
+    --text-primary: Main text color
+    --text-secondary: Secondary text
+    --text-muted: Grayed out text
+    --text-primary: Main headings
+    --border-light: Subtle border
+    --accent-herb: Main green brand color
+    --accent-herb-dark: Darker green (hover states)
+    --accent-herb-light: Light green background
+    --sidebar-green: Sidebar background
+
+Spacing System:
+    --radius-md: Border radius for inputs
+    --radius-lg: Border radius for cards
+    --radius-full: 999px for rounded buttons
+
+Transitions:
+    --transition-fast: 0.15s
+    --transition-normal: 0.3s
+
+Shadows:
+    --shadow-sm: Light shadows
+    --shadow-lg: Strong shadows
+
+B. Front-End Styling (assets/css/front-style.css)
+---------------------------------------------------
+
+Scoped Selectors:
+- .page-shop: Styles for shop.php pages
+- .page-product: Styles for product detail page
+
+Key Classes:
+    .btn-primary: Green action buttons
+    .btn-secondary: Outlined secondary buttons
+    .btn-cart: Add to cart button (green)
+    .product-card: Product grid item
+    .navbar: Top navigation
+    .cart-badge: Cart item counter
+    .admin-link: Admin access button
+
+C. Responsive Design
+---------------------
+
+Mobile-first breakpoint:
+    @media (max-width: 768px)
+    - Single column layouts
+    - Stacked buttons
+    - Adjusted spacing
+
+
+================================================================================
+8. HOW TO ADD NEW FEATURES
+================================================================================
+
+SCENARIO 1: Add a New Product Field
+-----------------------------------
+Example: Add "Brand" field to products
+
+1. Database:
+   ALTER TABLE produits ADD COLUMN brand VARCHAR(100);
+
+2. Update Produit Model:
+   class Produit {
+       public $nom, $prix, $description, $stock, $categorie, $image_url, $brand;
+       
+       public function __construct($nom, $prix, $description, $stock, $categorie, $image_url, $brand) {
+           ...
+           $this->brand = $brand;
+       }
+   }
+
+3. Update Controller (getById, getByIds, getAll):
+   // No changes needed - still work with SELECT *
+
+4. Update Insert/Update SQL:
+   INSERT INTO produits (nom, ..., brand) VALUES (?, ..., ?)
+   // Update in ProduitController::add() and update()
+
+5. Update Forms (ajout.php, modifier.php):
+   <div class="form-group">
+       <label for="brand">Brand</label>
+       <input type="text" name="brand" value="<?php echo $values['brand']; ?>">
+   </div>
+
+6. Update List Display (liste.php):
+   <td><?php echo $product['brand']; ?></td>
+
+7. Update Validation (validateData):
+   if(empty($data['brand'])) {
+       $errors['brand'] = 'Brand is required';
+   }
+
+
+SCENARIO 2: Add a New Product Category
+--------------------------------------
+
+1. No database changes needed (categorie is just stored as string)
+
+2. Update Forms (ajout.php, modifier.php):
+   <select name="categorie">
+       <option value="">Select</option>
+       <option value="Protéines">Protéines</option>
+       <option value="Boissons">Boissons</option>  <!-- NEW -->
+       ...
+   </select>
+
+3. That's it! getCategories() picks it up automatically
+   When you add a product with new category, it appears in filters
+
+
+SCENARIO 3: Add Product Ratings/Reviews
+-----------------------------------------
+
+1. Create new table:
+   CREATE TABLE avis (
+       id INT PRIMARY KEY AUTO_INCREMENT,
+       produit_id INT NOT NULL,
+       note INT (1-5),
+       commentaire TEXT,
+       created_at TIMESTAMP,
+       FOREIGN KEY (produit_id) REFERENCES produits(id)
+   );
+
+2. Add function to Controller:
+   public function getReviews($productId) {
+       $stmt = $this->pdo->prepare(
+           "SELECT * FROM avis WHERE produit_id = ? ORDER BY created_at DESC"
+       );
+       $stmt->execute([$productId]);
+       return $stmt->fetchAll(PDO::FETCH_ASSOC);
+   }
+
+3. Display on product.php:
+   $reviews = $controller->getReviews($product['id']);
+   foreach($reviews as $review) {
+       echo "<div class='review'>";
+       echo "<p>Rating: {$review['note']}/5</p>";
+       echo "<p>{$review['commentaire']}</p>";
+       echo "</div>";
+   }
+
+
+SCENARIO 4: Add Email on Checkout
+-----------------------------------
+
+1. Add to checkout.php form:
+   <input type="email" name="email" required>
+   <input type="text" name="phone" required>
+
+2. Save order data (create Orders table):
+   CREATE TABLE commandes (
+       id INT PRIMARY KEY AUTO_INCREMENT,
+       email VARCHAR(255),
+       phone VARCHAR(20),
+       total DECIMAL(10,2),
+       items JSON,
+       created_at TIMESTAMP
+   );
+
+3. Process in checkout.php:
+   if($_SERVER['REQUEST_METHOD'] === 'POST') {
+       $email = $_POST['email'];
+       $items = json_encode($_SESSION['cart']);
+       
+       $stmt = $pdo->prepare(
+           "INSERT INTO commandes (email, total, items) VALUES (?, ?, ?)"
+       );
+       $stmt->execute([$email, $total, $items]);
+       
+       $_SESSION['cart'] = [];
+   }
+
+
+SCENARIO 5: Add Search to Admin List
+-------------------------------------
+
+1. Already implemented! In liste.php:
+   <form method="GET">
+       <input type="text" name="search" placeholder="Search...">
+       <button type="submit">Search</button>
+   </form>
+   
+   $search = $_GET['search'] ?? '';
+   $produits = $controller->getAll($search);
+
+2. Uses ProduitController::getAll($search) which searches in name
+
+
+================================================================================
+9. COMMON WORKFLOWS
+================================================================================
+
+WORKFLOW 1: Customer Adds Product to Cart
+-------------------------------------------
+
+1. User on shop.php clicks "Ajouter" on a product
+   <a href="cart.php?action=add&id=5">Ajouter</a>
+   // OR goes to product.php first
+
+2. User on product.php fills quantity and clicks submit
+   <form method="POST" action="cart.php">
+       <input type="hidden" name="action" value="add">
+       <input type="hidden" name="product_id" value="5">
+       <input type="number" name="quantity" value="2">
+       <button type="submit">Add to Cart</button>
+   </form>
+
+3. cart.php processes:
+   $action = $_POST['action'] ?? $_GET['action'];
+   $productId = $_POST['product_id'] ?? $_GET['id'];
+   $quantity = $_POST['quantity'] ?? 1;
+   
+   if($action === 'add' && $productId > 0) {
+       $_SESSION['cart'][$productId] = ($_SESSION['cart'][$productId] ?? 0) + $quantity;
+   }
+
+4. Cart now has: $_SESSION['cart'][5] = 2;
+
+5. Cart.php displays cart items:
+   $products = $controller->getByIds(array_keys($cart));
+   foreach($products as $product) {
+       $quantity = $cart[$product['id']];
+       $subtotal = $product['prix'] * $quantity;
+       // Display in table
+   }
+
+6. User clicks "Proceed to Checkout"
+   Link to checkout.php
+
+
+WORKFLOW 2: Admin Adds New Product
+-----------------------------------
+
+1. Admin clicks "Nouveau produit" in back office
+   Goes to Views/back/produits/ajout.php
+
+2. Fills form:
+   - Nom: "Creatine Monohydrate"
+   - Prix: 19.99
+   - Description: "High quality creatine..."
+   - Stock: 200
+   - Catégorie: "Acides Aminés"
+   - Image: Selects creatine.jpg
+
+3. JavaScript validates form:
+   - Name length >= 3 ✓
+   - Price > 0 ✓
+   - Stock >= 0 ✓
+   - Category selected ✓
+
+4. Form submitted via POST:
+   $_POST contains all form data
+
+5. Server processes:
+   $values['nom'] = trim($_POST['nom']);
+   $values['prix'] = $_POST['prix'];
+   // ... etc
+   
+   $controller->validateData($values, $errors);  // Re-validate
+   
+   if(empty($errors)) {
+       $upload = $controller->saveImage($_FILES['image']);
+       if($upload) {
+           $values['image_url'] = $upload;
+           $produit = new Produit(...);
+           $controller->add($produit);
+           // Redirect to liste.php?success=1
+       }
+   }
+
+6. New product now appears in shop.php and lists.php
+
+
+WORKFLOW 3: Admin Edits Product
+--------------------------------
+
+1. Admin on liste.php clicks "Éditer" on product
+   Links to modifier.php?id=5
+
+2. PHP loads product:
+   $product = $controller->getById(5);
+   // Form pre-fills with current values
+
+3. Admin changes price from 49.99 to 39.99
+
+4. Clicks "Enregistrer" (Save)
+
+5. Server processes (similar to add, but calls update):
+   if($controller->update($id, $produit)) {
+       header('Location: liste.php?updated=1');
+   }
+
+6. Product updated and list refreshes
+
+
+WORKFLOW 4: Admin Deletes Product
+----------------------------------
+
+1. Admin on liste.php clicks delete icon for product ID 5
+
+2. Links to supprimer.php?id=5
+
+3. PHP executes:
+   if(isset($_GET['id'])) {
+       $controller->delete($_GET['id']);  // Deletes from database
+       header('Location: liste.php?deleted=1');
+   }
+
+4. Redirects back to list, product no longer appears
+
+
+WORKFLOW 5: Customer Completes Purchase
+-----------------------------------------
+
+1. Customer in cart.php clicks "Proceed to Checkout"
+   Links to checkout.php
+
+2. checkout.php displays:
+   - Order summary with all items and total
+   - Checkout form (name, email, address, etc.)
+
+3. Customer fills form and clicks "Place Order"
+
+4. Form submits via POST to same page
+
+5. PHP processes:
+   if($_SERVER['REQUEST_METHOD'] === 'POST') {
+       $_SESSION['cart'] = [];  // Clear cart
+       $cartCount = 0;
+       $orderComplete = true;
+   }
+
+6. Page reloads and displays success message:
+   "Your order has been placed!"
+   "Thank you for your purchase"
+
+7. Cart is now empty
+   $_SESSION['cart'] = []
+
+
+================================================================================
+KEY FUNCTIONS QUICK REFERENCE
+================================================================================
+
+Frontend Entry Points:
+    index.php           Landing page
+    shop.php            Product browsing
+    product.php?id=X    Product detail
+    cart.php            Shopping cart
+    checkout.php        Order form
+
+Backend Entry Points:
+    index.php           Dashboard
+    (admin/produits)
+    liste.php           Product list
+    ajout.php           Add product
+    modifier.php?id=X   Edit product
+    supprimer.php?id=X  Delete product
+
+Core Controller Methods:
+    getAll()            Get products (with filters)
+    getById($id)        Get single product
+    getByIds($ids)      Get multiple products
+    getCategories()     Get all categories
+    add($produit)       Insert new product
+    update($id, $produit)  Update product
+    delete($id)         Delete product
+    validateData()      Validate all fields
+    saveImage()         Upload image file
+
+Session Variables:
+    $_SESSION['cart']   Cart items [productId => quantity]
+    $_SESSION['cart_count']  Total items in cart
+
+GET Parameters:
+    product.php?id=X    Product detail page
+    modifier.php?id=X   Edit product
+    supprimer.php?id=X  Delete product
+    shop.php?search=X&category=Y  Filter products
+    cart.php?action=add&id=X  Quick add to cart
+
+POST Parameters (Cart):
+    action: 'add'/'update'/'remove'
+    product_id: Product ID
+    quantity: Quantity to add/update
+
+POST Parameters (Product Forms):
+    nom: Product name
+    prix: Price
+    description: Description
+    stock: Stock quantity
+    categorie: Category
+    image: Image file
+
+POST Parameters (Checkout):
+    [Form fields for customer info]
+
+
+================================================================================
+TIPS & BEST PRACTICES USED IN THIS PROJECT
+================================================================================
+
+1. SECURITY
+   - Use prepared statements (PDO prepare/execute)
+   - Escape output with htmlspecialchars()
+   - Validate all inputs server-side
+   - Handle file uploads safely
+   - Check file MIME types
+
+2. UX
+   - Show loading states on buttons
+   - Real-time form validation (client-side)
+   - Responsive design for mobile
+   - Clear error messages
+   - Breadcrumb navigation
+   - Product images with fallback
+
+3. CODE ORGANIZATION
+   - Separate concerns (Models, Controllers, Views)
+   - Reusable header/footer partials
+   - Consistent naming conventions
+   - Comments for complex logic
+   - DRY principle (Don't Repeat Yourself)
+
+4. PERFORMANCE
+   - CSS variables for theming
+   - Single stylesheet for all front pages
+   - Efficient database queries
+   - Image optimization
+
+5. MAINTAINABILITY
+   - Clear directory structure
+   - Scoped CSS classes (page-shop, page-product)
+   - Consistent button styles
+   - Easy to add new categories
+   - Database prepared for scaling
+
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================
+
+For Questions or Updates:
+- Check controller functions for availability
+- Look at existing pages for patterns
+- Follow MVC structure for new features
+- Test all input validation both client & server-side
+
+Happy coding!

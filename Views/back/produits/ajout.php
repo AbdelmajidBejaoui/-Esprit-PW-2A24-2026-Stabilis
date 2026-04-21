@@ -12,23 +12,33 @@ $values = [
     'image_url' => null,
 ];
 
-if($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $values['nom'] = trim($_POST['nom'] ?? '');
-    $values['prix'] = $_POST['prix'] ?? '';
-    $values['description'] = trim($_POST['description'] ?? '');
-    $values['stock'] = $_POST['stock'] ?? '';
-    $values['categorie'] = $_POST['categorie'] ?? '';
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['nom'])) {
+        $values['nom'] = trim($_POST['nom']);
+    }
+    if (isset($_POST['prix'])) {
+        $values['prix'] = $_POST['prix'];
+    }
+    if (isset($_POST['description'])) {
+        $values['description'] = trim($_POST['description']);
+    }
+    if (isset($_POST['stock'])) {
+        $values['stock'] = $_POST['stock'];
+    }
+    if (isset($_POST['categorie'])) {
+        $values['categorie'] = $_POST['categorie'];
+    }
 
-    if($controller->validateData($values, $errors)) {
-        $upload = $controller->saveImage($_FILES['image'] ?? []);
-        if($upload === false) {
+    if ($controller->validateData($values, $errors)) {
+        $upload = $controller->saveImage(isset($_FILES['image']) ? $_FILES['image'] : []);
+        if ($upload === false) {
             $errors['image'] = 'Format de fichier non pris en charge. Utilisez JPG, PNG ou WEBP.';
         } else {
             $values['image_url'] = $upload;
         }
     }
 
-    if(empty($errors)) {
+    if (count($errors) == 0) {
         $produit = new Produit(
             $values['nom'],
             floatval($values['prix']),
@@ -38,7 +48,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             $values['image_url']
         );
 
-        if($controller->add($produit)) {
+        if ($controller->add($produit)) {
             header('Location: liste.php?success=1');
             exit();
         }
@@ -47,7 +57,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$title = "Ajouter un produit - Stabilis™";
+$title = "Ajouter un produit - Stabilis";
 require_once __DIR__ . '/../../partials/header.php';
 ?>
 
@@ -66,47 +76,47 @@ require_once __DIR__ . '/../../partials/header.php';
             <div class="form-group">
                 <label for="nom">Nom du produit</label>
                 <input type="text" name="nom" id="nom" class="form-control" placeholder="Whey Protein Isolat" value="<?php echo htmlspecialchars($values['nom']); ?>">
-                <div id="nomError" class="error-message"><?php echo $errors['nom'] ?? ''; ?></div>
+                <div id="nomError" class="error-message"><?php if (isset($errors['nom'])) { echo $errors['nom']; } ?></div>
             </div>
             
             <div class="form-group">
                 <label for="prix">Prix (€)</label>
                 <input type="number" step="0.01" name="prix" id="prix" class="form-control" placeholder="49.99" value="<?php echo htmlspecialchars($values['prix']); ?>">
-                <div id="prixError" class="error-message"><?php echo $errors['prix'] ?? ''; ?></div>
+                <div id="prixError" class="error-message"><?php if (isset($errors['prix'])) { echo $errors['prix']; } ?></div>
             </div>
             
             <div class="form-group">
                 <label for="description">Description</label>
                 <textarea name="description" id="description" class="form-control" rows="3" placeholder="Description du produit..."><?php echo htmlspecialchars($values['description']); ?></textarea>
                 <div class="hint">Décrivez les bénéfices du produit.</div>
-                <div class="error-message"><?php echo $errors['description'] ?? ''; ?></div>
+                <div class="error-message"><?php if (isset($errors['description'])) { echo $errors['description']; } ?></div>
             </div>
             
             <div class="form-group">
                 <label for="stock">Stock</label>
                 <input type="number" name="stock" id="stock" class="form-control" value="<?php echo htmlspecialchars($values['stock']); ?>">
-                <div id="stockError" class="error-message"><?php echo $errors['stock'] ?? ''; ?></div>
+                <div id="stockError" class="error-message"><?php if (isset($errors['stock'])) { echo $errors['stock']; } ?></div>
             </div>
             
             <div class="form-group">
                 <label for="categorie">Catégorie</label>
                 <select name="categorie" id="categorie" class="form-control">
                     <option value="">Sélectionner</option>
-                    <option value="Protéines" <?php echo $values['categorie'] === 'Protéines' ? 'selected' : ''; ?>>Protéines</option>
-                    <option value="Acides Aminés" <?php echo $values['categorie'] === 'Acides Aminés' ? 'selected' : ''; ?>>Acides Aminés</option>
-                    <option value="Pré-workout" <?php echo $values['categorie'] === 'Pré-workout' ? 'selected' : ''; ?>>Pré-workout</option>
-                    <option value="Vitamines" <?php echo $values['categorie'] === 'Vitamines' ? 'selected' : ''; ?>>Vitamines</option>
-                    <option value="Snacks" <?php echo $values['categorie'] === 'Snacks' ? 'selected' : ''; ?>>Snacks</option>
-                    <option value="Accessoires" <?php echo $values['categorie'] === 'Accessoires' ? 'selected' : ''; ?>>Accessoires</option>
+                    <option value="Protéines"<?php if ($values['categorie'] === 'Protéines') { echo ' selected'; } ?>>Protéines</option>
+                    <option value="Acides Aminés"<?php if ($values['categorie'] === 'Acides Aminés') { echo ' selected'; } ?>>Acides Aminés</option>
+                    <option value="Pré-workout"<?php if ($values['categorie'] === 'Pré-workout') { echo ' selected'; } ?>>Pré-workout</option>
+                    <option value="Vitamines"<?php if ($values['categorie'] === 'Vitamines') { echo ' selected'; } ?>>Vitamines</option>
+                    <option value="Snacks"<?php if ($values['categorie'] === 'Snacks') { echo ' selected'; } ?>>Snacks</option>
+                    <option value="Accessoires"<?php if ($values['categorie'] === 'Accessoires') { echo ' selected'; } ?>>Accessoires</option>
                 </select>
-                <div id="categorieError" class="error-message"><?php echo $errors['categorie'] ?? ''; ?></div>
+                <div id="categorieError" class="error-message"><?php if (isset($errors['categorie'])) { echo $errors['categorie']; } ?></div>
             </div>
             
             <div class="form-group">
                 <label for="image">Image du produit</label>
                 <input type="file" accept="image/png,image/jpeg,image/webp" name="image" id="image" class="form-control">
                 <div class="hint">Choisissez une image au format JPG, PNG ou WEBP. Le système se charge du stockage.</div>
-                <div class="error-message"><?php echo $errors['image'] ?? ''; ?></div>
+                <div class="error-message"><?php if (isset($errors['image'])) { echo $errors['image']; } ?></div>
             </div>
             
             <div style="display: flex; gap: 12px; margin-top: 32px;">
@@ -120,65 +130,5 @@ require_once __DIR__ . '/../../partials/header.php';
         </form>
     </div>
 </div>
-
-<script>
-document.getElementById('productForm').addEventListener('submit', function(e) {
-    let isValid = true;
-    
-    const nom = document.getElementById('nom').value.trim();
-    const nomError = document.getElementById('nomError');
-    if(nom.length < 3) {
-        nomError.textContent = 'Le nom doit contenir au moins 3 caractères';
-        document.getElementById('nom').classList.add('input-error');
-        isValid = false;
-    } else {
-        nomError.textContent = '';
-        document.getElementById('nom').classList.remove('input-error');
-    }
-    
-    const prix = parseFloat(document.getElementById('prix').value);
-    const prixError = document.getElementById('prixError');
-    if(isNaN(prix) || prix <= 0) {
-        prixError.textContent = 'Le prix doit être positif';
-        document.getElementById('prix').classList.add('input-error');
-        isValid = false;
-    } else {
-        prixError.textContent = '';
-        document.getElementById('prix').classList.remove('input-error');
-    }
-    
-    const stock = parseInt(document.getElementById('stock').value, 10);
-    const stockError = document.getElementById('stockError');
-    if(isNaN(stock) || stock < 0) {
-        stockError.textContent = 'Le stock doit être un entier positif ou zéro';
-        document.getElementById('stock').classList.add('input-error');
-        isValid = false;
-    } else {
-        stockError.textContent = '';
-        document.getElementById('stock').classList.remove('input-error');
-    }
-    
-    const categorie = document.getElementById('categorie').value;
-    const categorieError = document.getElementById('categorieError');
-    if(categorie === '') {
-        categorieError.textContent = 'Sélectionnez une catégorie';
-        document.getElementById('categorie').classList.add('input-error');
-        isValid = false;
-    } else {
-        categorieError.textContent = '';
-        document.getElementById('categorie').classList.remove('input-error');
-    }
-    
-    if(isValid) {
-        // Show loading state
-        const btn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        btn.disabled = true;
-        btnText.innerHTML = '<span class="loading-spinner-custom"></span> Chargement...';
-    } else {
-        e.preventDefault();
-    }
-});
-</script>
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>
