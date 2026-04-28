@@ -47,6 +47,10 @@ require_once __DIR__ . '/partials/layout_top.php';
                 <a href="addUser.php" class="btn btn-primary btn-sm">
                     <i class="fas fa-user-plus mr-1"></i> Ajouter
                 </a>
+
+                <a href="exportUsersPDF.php" class="btn btn-danger btn-sm ml-2" title="Exporter en PDF">
+                    <i class="fas fa-file-pdf mr-1"></i> Exporter PDF
+                </a>
             </div>
         </div>
     </div>

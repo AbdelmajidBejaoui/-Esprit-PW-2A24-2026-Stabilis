@@ -355,5 +355,50 @@ class UserC
 
         return $errors;
     }
+
+    public function getStatistics()
+    {
+        $db = config::getConnexion();
+        $stats = [];
+
+        try {
+            // Total users
+            $totalUsers = (int) $db->query('SELECT COUNT(*) FROM `user`')->fetchColumn();
+            $stats['totalUsers'] = $totalUsers;
+
+            // Users by role
+            $roleQuery = $db->query('SELECT role, COUNT(*) as count FROM `user` GROUP BY role');
+            $stats['usersByRole'] = $roleQuery->fetchAll(PDO::FETCH_ASSOC);
+
+            // Users by dietary preference
+            $preferenceQuery = $db->query('SELECT preference_alimentaire, COUNT(*) as count FROM `user` GROUP BY preference_alimentaire');
+            $stats['usersByPreference'] = $preferenceQuery->fetchAll(PDO::FETCH_ASSOC);
+
+            // Users by account status
+            $statusQuery = $db->query('SELECT statut_compte, COUNT(*) as count FROM `user` GROUP BY statut_compte');
+            $stats['usersByStatus'] = $statusQuery->fetchAll(PDO::FETCH_ASSOC);
+
+            // Users by month (registration trend)
+            $monthQuery = $db->query('SELECT DATE_FORMAT(date_inscription, "%Y-%m") as month, COUNT(*) as count FROM `user` GROUP BY DATE_FORMAT(date_inscription, "%Y-%m") ORDER BY month DESC LIMIT 12');
+            $stats['usersByMonth'] = $monthQuery->fetchAll(PDO::FETCH_ASSOC);
+
+            return $stats;
+        } catch (Exception $e) {
+            die('Error: ' . $e->getMessage());
+        }
+    }
+
+    public function getAllUsersForExport()
+    {
+        $sql = 'SELECT * FROM `user` ORDER BY id DESC';
+        $db = config::getConnexion();
+
+        try {
+            $query = $db->query($sql);
+            return $query->fetchAll();
+        } catch (Exception $e) {
+            die('Error: ' . $e->getMessage());
+        }
+    }
 }
 ?>

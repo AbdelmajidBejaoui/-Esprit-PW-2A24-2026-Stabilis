@@ -57,6 +57,12 @@ if (!isset($activePage)) {
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="statistics.php" class="nav-link <?php echo $activePage === 'statistics' ? 'active' : ''; ?>">
+                            <i class="nav-icon fas fa-chart-bar"></i>
+                            <p>Statistiques</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a href="../FrontOffice/listUsers.php" class="nav-link">
                             <i class="nav-icon fas fa-globe"></i>
                             <p>Voir FrontOffice</p>
