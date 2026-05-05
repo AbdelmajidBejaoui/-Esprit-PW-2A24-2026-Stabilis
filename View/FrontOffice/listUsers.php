@@ -6,6 +6,9 @@ $loggedUser = null;
 if (frontofficeIsLoggedIn()) {
     $userC = new UserC();
     $loggedUser = $userC->getUserById((int) $_SESSION['front_user_id']);
+    if (!$loggedUser) {
+        frontofficeLogout();
+    }
 }
 
 $pageTitle = 'FrontOffice';

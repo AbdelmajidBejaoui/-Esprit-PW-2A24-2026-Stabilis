@@ -2,6 +2,14 @@
 require_once __DIR__ . '/partials/auth.php';
 require_once __DIR__ . '/../../Controller/UserC.php';
 
+// load site key for reCAPTCHA if configured
+$siteKey = '';
+$recfg = __DIR__ . '/../../config_recaptcha.php';
+if (file_exists($recfg)) {
+    $cfg = include $recfg;
+    $siteKey = $cfg['site_key'] ?? '';
+}
+
 if (frontofficeIsLoggedIn()) {
     header('Location: updateUser.php');
     exit;
@@ -20,21 +28,34 @@ if (isset($_GET['logout'])) {
 if (isset($_GET['deleted'])) {
     $infoMessage = 'Compte supprime avec succes.';
 }
+if (isset($_GET['invalid'])) {
+    $infoMessage = 'Session invalide. Veuillez vous reconnecter.';
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $errors = $userC->validateLoginData($_POST);
 
     if (empty($errors)) {
-        $email = trim($_POST['email']);
-        $password = $_POST['password'];
+        // verify reCAPTCHA first (if configured)
+        $recaptchaResponse = $_POST['g-recaptcha-response'] ?? '';
+        if (!$userC->verifyRecaptcha($recaptchaResponse)) {
+            $errors[] = 'Veuillez confirmer que vous n\'etes pas un robot.';
+        }
 
-        $user = $userC->authenticateUser($email, $password);
-        if (!$user) {
-            $errors[] = 'Email ou mot de passe incorrect, ou compte inactif.';
-        } else {
-            frontofficeLogin($user);
-            header('Location: updateUser.php');
-            exit;
+        if (empty($errors)) {
+            $email = trim($_POST['email']);
+            $password = $_POST['password'];
+
+            $user = $userC->authenticateUser($email, $password);
+            if (!$user) {
+                $errors[] = 'Email ou mot de passe incorrect, ou compte inactif.';
+            } else {
+                // Start Face ID verification before 2FA
+                $_SESSION['pending_face_user'] = (int) $user['id'];
+                $_SESSION['pending_face_email'] = $user['email'];
+                header('Location: verifyFace.php');
+                exit;
+            }
         }
     }
 }
@@ -74,8 +95,15 @@ require_once __DIR__ . '/partials/layout_top.php';
                         <label>Mot de passe</label>
                         <input class="form-control" type="password" name="password">
                     </div>
+                    <?php if ($siteKey !== ''): ?>
+                        <div class="mt-3">
+                            <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+                            <div class="g-recaptcha" data-sitekey="<?php echo htmlspecialchars($siteKey); ?>"></div>
+                        </div>
+                    <?php endif; ?>
                     <button type="submit" class="btn btn-vege">Se connecter</button>
                     <a href="addUser.php" class="btn btn-outline-secondary">Creer un compte</a>
+                    <a href="forgotPassword.php" class="btn btn-link">Mot de passe oublie ?</a>
                 </form>
             </div>
         </div>

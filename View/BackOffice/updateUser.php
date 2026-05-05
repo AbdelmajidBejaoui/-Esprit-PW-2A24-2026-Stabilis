@@ -20,6 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $errors = $userC->validateUserData($_POST, $passwordRequired);
 
     if (empty($errors)) {
+        $faceImage = $currentUser['face_image'] ?? null;
+        $faceDescriptor = $currentUser['face_descriptor'] ?? null;
         $user = new User(
             $id,
             trim($_POST['nom']),
@@ -28,7 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             trim($_POST['role']),
             trim($_POST['preference_alimentaire']),
             trim($_POST['date_inscription']),
-            (int) $_POST['statut_compte']
+            (int) $_POST['statut_compte'],
+            $faceImage,
+            $faceDescriptor
         );
 
         $userC->updateUser($user, $id, $passwordRequired);

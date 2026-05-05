@@ -94,6 +94,9 @@ require_once __DIR__ . '/partials/layout_top.php';
                                 <a href="updateUser.php?id=<?php echo (int) $u['id']; ?>" class="btn btn-warning btn-xs">
                                     <i class="fas fa-edit"></i>
                                 </a>
+                                <a href="blockUser.php?id=<?php echo (int) $u['id']; ?>" class="btn btn-dark btn-xs" onclick="return confirm('Bloquer cet utilisateur ?');">
+                                    <i class="fas fa-ban"></i>
+                                </a>
                                 <a href="deleteUser.php?id=<?php echo (int) $u['id']; ?>" class="btn btn-danger btn-xs" onclick="return confirm('Supprimer cet utilisateur ?');">
                                     <i class="fas fa-trash"></i>
                                 </a>

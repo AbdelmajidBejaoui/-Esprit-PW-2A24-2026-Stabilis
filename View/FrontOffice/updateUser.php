@@ -13,7 +13,9 @@ $id = (int) $_SESSION['front_user_id'];
 
 $currentUser = $userC->getUserById($id);
 if (!$currentUser) {
-    die('Utilisateur introuvable.');
+    frontofficeLogout();
+    header('Location: login.php?invalid=1');
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -21,6 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $errors = $userC->validateProfileData($_POST, $passwordRequired, $id);
 
     if (empty($errors)) {
+        $faceImage = $currentUser['face_image'] ?? null;
+        $faceDescriptor = $currentUser['face_descriptor'] ?? null;
         $user = new User(
             $id,
             trim($_POST['nom']),
@@ -29,7 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'client',
             trim($_POST['preference_alimentaire']),
             $currentUser['date_inscription'],
-            (int) $currentUser['statut_compte']
+            (int) $currentUser['statut_compte'],
+            $faceImage,
+            $faceDescriptor
         );
 
         $userC->updateUser($user, $id, $passwordRequired);
