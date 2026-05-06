@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Module Utilisateurs - NutriSmart</title>
+    <title>Module Utilisateurs - Stabilis</title>
 </head>
 <body>
     <h1>Module Gestion Utilisateurs</h1>

@@ -428,7 +428,7 @@ class UserC
         return $errors;
     }
 
-    // --- Password reset flow ---
+
     public function createPasswordReset(string $email)
     {
         $db = config::getConnexion();
@@ -439,11 +439,11 @@ class UserC
             $user = $query->fetch();
 
             if (!$user) {
-                return false; // do not reveal whether email exists
+                return false; 
             }
 
             $token = bin2hex(random_bytes(16));
-            $expiresAt = date('Y-m-d H:i:s', time() + 3600); // 1 hour
+            $expiresAt = date('Y-m-d H:i:s', time() + 3600); 
 
             $insert = $db->prepare('INSERT INTO password_resets (user_id, token, expires_at) VALUES (:user_id, :token, :expires_at)');
             $insert->execute([
@@ -452,14 +452,14 @@ class UserC
                 'expires_at' => $expiresAt
             ]);
 
-            // Send email (simple mail() usage)
+    
             $subject = 'Réinitialisation de votre mot de passe';
             $resetLink = $this->buildResetLink($token);
             $message = "Bonjour " . $user['nom'] . ",\n\n";
             $message .= "Vous avez demandé la réinitialisation de votre mot de passe.\n";
             $message .= "Veuillez utiliser le lien suivant pour définir un nouveau mot de passe (valide 1 heure):\n\n";
             $message .= $resetLink . "\n\n";
-            $message .= "Si vous n'avez pas demandé cette action, ignorez ce message.\n\nCordialement,\nNutriSmart";
+            $message .= "Si vous n'avez pas demandé cette action, ignorez ce message.\n\nCordialement,\nStabilis";
 
             $headers = 'From: no-reply@localhost' . "\r\n" . 'Reply-To: no-reply@localhost' . "\r\n";
             // Suppress errors, return true/false based on mail() result
@@ -561,7 +561,7 @@ class UserC
         }
     }
 
-    // --- Email verification for new users ---
+
     public function createEmailVerification(int $userId, string $email)
     {
         $db = config::getConnexion();
@@ -576,9 +576,9 @@ class UserC
                 'expires_at' => $expiresAt
             ]);
 
-            $subject = 'Verification de votre email - NutriSmart';
+            $subject = 'Verification de votre email - Stabilis';
             $verifyLink = sprintf('http://%s/Projet/View/FrontOffice/verifyEmail.php?token=%s', $_SERVER['HTTP_HOST'] ?? 'localhost', $token);
-            $message = "Bonjour,\n\nBienvenue sur NutriSmart. Cliquez sur le lien suivant pour verifier votre adresse email :\n\n" . $verifyLink . "\n\nCe lien est valable 24 heures.\n\nCordialement,\nNutriSmart";
+            $message = "Bonjour,\n\nBienvenue sur Stabilis. Cliquez sur le lien suivant pour verifier votre adresse email :\n\n" . $verifyLink . "\n\nCe lien est valable 24 heures.\n\nCordialement,\nStabilis";
             $headers = 'From: no-reply@localhost' . "\r\n" . 'Reply-To: no-reply@localhost' . "\r\n";
             @mail($email, $subject, $message, $headers);
 
@@ -616,13 +616,13 @@ class UserC
         }
     }
 
-    // --- Two-factor authentication (email OTP) ---
+    
     public function sendTwoFactorCode(int $userId, string $email)
     {
         $db = config::getConnexion();
         try {
-            $code = random_int(100000, 999999); // 6-digit code
-            $expiresAt = date('Y-m-d H:i:s', time() + 300); // 5 minutes
+            $code = random_int(100000, 999999); 
+            $expiresAt = date('Y-m-d H:i:s', time() + 300); 
 
             $insert = $db->prepare('INSERT INTO two_factor_codes (user_id, code, expires_at) VALUES (:user_id, :code, :expires_at)');
             $insert->execute([
@@ -631,9 +631,9 @@ class UserC
                 'expires_at' => $expiresAt
             ]);
 
-            // Send email
-            $subject = 'Code de verification - NutriSmart';
-            $message = "Bonjour,\n\nVotre code de verification est : " . $code . "\nIl est valable 5 minutes.\n\nCordialement,\nNutriSmart";
+            
+            $subject = 'Code de verification - Stabilis';
+            $message = "Bonjour,\n\nVotre code de verification est : " . $code . "\nIl est valable 5 minutes.\n\nCordialement,\nStabilis";
             $headers = 'From: no-reply@localhost' . "\r\n" . 'Reply-To: no-reply@localhost' . "\r\n";
             @mail($email, $subject, $message, $headers);
 
@@ -654,7 +654,7 @@ class UserC
                 return false;
             }
             if (strtotime($row['expires_at']) < time()) {
-                // expired -> remove
+                
                 $del = $db->prepare('DELETE FROM two_factor_codes WHERE id = :id');
                 $del->execute(['id' => $row['id']]);
                 return false;
@@ -676,23 +676,23 @@ class UserC
         $stats = [];
 
         try {
-            // Total users
+            
             $totalUsers = (int) $db->query('SELECT COUNT(*) FROM `user`')->fetchColumn();
             $stats['totalUsers'] = $totalUsers;
 
-            // Users by role
+            
             $roleQuery = $db->query('SELECT role, COUNT(*) as count FROM `user` GROUP BY role');
             $stats['usersByRole'] = $roleQuery->fetchAll(PDO::FETCH_ASSOC);
 
-            // Users by dietary preference
+            
             $preferenceQuery = $db->query('SELECT preference_alimentaire, COUNT(*) as count FROM `user` GROUP BY preference_alimentaire');
             $stats['usersByPreference'] = $preferenceQuery->fetchAll(PDO::FETCH_ASSOC);
 
-            // Users by account status
+            
             $statusQuery = $db->query('SELECT statut_compte, COUNT(*) as count FROM `user` GROUP BY statut_compte');
             $stats['usersByStatus'] = $statusQuery->fetchAll(PDO::FETCH_ASSOC);
 
-            // Users by month (registration trend)
+            
             $monthQuery = $db->query('SELECT DATE_FORMAT(date_inscription, "%Y-%m") as month, COUNT(*) as count FROM `user` GROUP BY DATE_FORMAT(date_inscription, "%Y-%m") ORDER BY month DESC LIMIT 12');
             $stats['usersByMonth'] = $monthQuery->fetchAll(PDO::FETCH_ASSOC);
 

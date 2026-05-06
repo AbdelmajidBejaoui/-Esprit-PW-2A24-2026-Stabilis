@@ -43,7 +43,7 @@ class PdfExporter
     private function buildPageContent(array $users, array $columns, int $pageNumber, int $totalPages): string
     {
         $content = [];
-        $this->writeText($content, 248, 540, 'Liste des Utilisateurs - NutriSmart', self::TITLE_FONT_SIZE);
+        $this->writeText($content, 248, 540, 'Liste des Utilisateurs - Stabilis', self::TITLE_FONT_SIZE);
         $this->writeText($content, 272, 520, 'Export backoffice genere le ' . date('d/m/Y H:i'), self::SUBTITLE_FONT_SIZE);
 
         $tableTop = 490;

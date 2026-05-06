@@ -1,14 +1,6 @@
 <?php
-// Copy this file to config_recaptcha.php and fill with your keys.
-// Keep config_recaptcha.php out of version control (it's in .gitignore).
-
-// Your reCAPTCHA site key (public) - used in the HTML widget
-$RECAPTCHA_SITE_KEY = 'your-site-key-here';
-
-// Your reCAPTCHA secret key (private) - used by server to verify responses
-$RECAPTCHA_SECRET = 'your-secret-key-here';
-
+// Copy this file to config_recaptcha.php and fill in your keys.
 return [
-    'site_key' => $RECAPTCHA_SITE_KEY,
-    'secret' => $RECAPTCHA_SECRET,
+    'site_key' => 'YOUR_SITE_KEY_HERE',
+    'secret' => 'YOUR_SECRET_KEY_HERE'
 ];

@@ -3,8 +3,7 @@
 
     <footer class="site-footer">
         <div class="container d-flex justify-content-between flex-wrap">
-            <span>NutriSmart FrontOffice</span>
-            <span>Module Gestion Utilisateurs</span>
+            <span>Stabilis FrontOffice</span>
         </div>
     </footer>
 

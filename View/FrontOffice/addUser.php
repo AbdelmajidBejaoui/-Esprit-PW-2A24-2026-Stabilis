@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $pageTitle = 'Inscription';
 $heroTitle = 'Create Your Athlete Profile';
-$heroSubtitle = 'Rejoignez la communaute NutriSmart';
+$heroSubtitle = 'Rejoignez la communaute Stabilis';
 $activePage = 'signup';
 require_once __DIR__ . '/partials/layout_top.php';
 ?>

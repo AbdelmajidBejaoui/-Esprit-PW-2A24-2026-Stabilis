@@ -3,7 +3,7 @@
     </div>
 
     <footer class="main-footer">
-        <strong>NutriSmart BackOffice.</strong>
+        <strong>Stabilis BackOffice.</strong>
         <div class="float-right d-none d-sm-inline-block">
             Module Gestion Utilisateurs
         </div>
