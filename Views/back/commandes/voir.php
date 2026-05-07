@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['statut'])) {
     }
 }
 
-$title = 'Commande groupée #' . $commande['id'] . ' - Stabilis™';
+$title = 'Commande groupée #' . $commande['id'] . ' - Stabilis';
 require_once __DIR__ . '/../../partials/header.php';
 ?>
 
@@ -113,13 +113,32 @@ require_once __DIR__ . '/../../partials/header.php';
                 <div><?php echo htmlspecialchars($commande['statut']); ?></div>
             </div>
             <div class="form-group">
-                <label>Total</label>
-                <div><strong><?php echo number_format($commande['total'], 2); ?> €</strong></div>
+                <label>Sous-total</label>
+                <div><?php echo number_format($commande['total'], 2); ?> €</div>
             </div>
+            <?php if (!empty($commande['discount_percent'])): ?>
+                <div class="form-group">
+                    <label>Réduction appliquée</label>
+                    <div style="color: #1b5e20; font-weight: 600;">
+                        -<?php echo $commande['discount_percent']; ?>%
+                        <small style="display: block; color: #666; font-weight: normal;">-<?php echo number_format((float)($commande['discount_amount'] ?? 0), 2); ?> €</small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Total après réduction</label>
+                    <div><strong style="color: #1b5e20; font-size: 18px;"><?php echo number_format((float)($commande['final_total'] ?? $commande['total']), 2); ?> €</strong></div>
+                </div>
+            <?php else: ?>
+                <div class="form-group">
+                    <label>Total</label>
+                    <div><strong><?php echo number_format($commande['total'], 2); ?> €</strong></div>
+                </div>
+            <?php endif; ?>
             <form method="POST">
                 <div class="form-group">
                     <label>Nouveau statut</label>
                     <select name="statut" class="form-control">
+                        <option value="pre-order"<?php echo $commande['statut'] === 'pre-order' ? ' selected' : ''; ?>>Pre-order</option>
                         <option value="En attente"<?php echo $commande['statut'] === 'En attente' ? ' selected' : ''; ?>>En attente</option>
                         <option value="Validée"<?php echo $commande['statut'] === 'Validée' ? ' selected' : ''; ?>>Validée</option>
                         <option value="Expédiée"<?php echo $commande['statut'] === 'Expédiée' ? ' selected' : ''; ?>>Expédiée</option>

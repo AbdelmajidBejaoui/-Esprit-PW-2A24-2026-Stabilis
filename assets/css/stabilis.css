@@ -1,8 +1,4 @@
-/* ========================================
-   STABILIS™ DESIGN SYSTEM
-   Nutrition durable · Performance intelligente
-   Version 1.0
-   ======================================== */
+
 
 :root {
     --bg-surface: #FBFBF9;
@@ -47,7 +43,7 @@ body {
     line-height: 1.45;
 }
 
-/* TYPOGRAPHIE */
+
 h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     letter-spacing: -0.3px;
@@ -57,7 +53,7 @@ h1 { font-size: 28px; }
 h2 { font-size: 24px; }
 h3 { font-size: 20px; }
 
-/* SIDEBAR */
+
 .sidebar {
     position: fixed;
     left: 0;
@@ -68,10 +64,11 @@ h3 { font-size: 20px; }
     z-index: 100;
     transition: all var(--transition-normal);
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .sidebar-header {
-    padding: 32px 24px;
+    padding: 30px 24px 28px;
     border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
@@ -97,40 +94,139 @@ h3 { font-size: 20px; }
 
 .sidebar-nav {
     list-style: none;
-    padding: 24px 16px;
+    padding: 18px 12px 96px;
 }
 
 .sidebar-nav li {
     margin-bottom: 4px;
 }
 
-.sidebar-nav a {
+.sidebar-nav a,
+.sidebar-group-toggle {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 16px;
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
     color: var(--sidebar-text);
     text-decoration: none;
-    border-radius: 10px;
+    border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
     transition: all var(--transition-fast);
+    border: 1px solid transparent;
+    background: transparent;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: left;
+    appearance: none;
+    -webkit-appearance: none;
 }
 
-.sidebar-nav a i {
+.sidebar-group-toggle {
+    justify-content: space-between;
+}
+
+.sidebar-group-toggle > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.sidebar-nav a i,
+.sidebar-group-toggle i {
     width: 20px;
     font-size: 16px;
     color: rgba(255,255,255,0.6);
+    text-align: center;
 }
 
 .sidebar-nav a:hover,
-.sidebar-nav a.active {
-    background: var(--sidebar-green-light);
+.sidebar-nav a.active,
+.sidebar-group-toggle:hover,
+.sidebar-group-toggle.active {
+    background: rgba(255,255,255,0.09);
+    color: white;
+    border-color: rgba(255,255,255,0.06);
+}
+
+.sidebar-nav a.active i,
+.sidebar-group-toggle.active i,
+.sidebar-group-toggle:hover i {
     color: white;
 }
 
-.sidebar-nav a.active i {
+.sidebar-group {
+    margin: 4px 0;
+}
+
+.sidebar-group-toggle .sidebar-chevron {
+    width: auto;
+    font-size: 11px;
+    transition: transform var(--transition-fast);
+}
+
+.sidebar-group.is-open .sidebar-chevron {
+    transform: rotate(180deg);
+}
+
+.sidebar-subnav {
+    list-style: none;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0 0 0 22px;
+    border-left: 1px solid transparent;
+    transition: max-height var(--transition-normal), padding var(--transition-fast);
+}
+
+.sidebar-group.is-open .sidebar-subnav {
+    max-height: 190px;
+    padding: 5px 0 3px 10px;
+    border-left-color: rgba(255,255,255,0.12);
+}
+
+.sidebar-subnav li {
+    margin-bottom: 3px;
+}
+
+.sidebar-subnav a {
+    position: relative;
+    min-height: 34px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: rgba(212,230,222,0.78);
+}
+
+.sidebar-subnav a::before {
+    content: "";
+    position: absolute;
+    left: -13px;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.22);
+    transform: translateY(-50%);
+}
+
+.sidebar-subnav a i {
+    width: 16px;
+    font-size: 12px;
+    opacity: 0.78;
+}
+
+.sidebar-subnav a.active {
+    background: rgba(255,255,255,0.10);
     color: white;
+    box-shadow: none;
+}
+
+.sidebar-subnav a.active::before {
+    background: var(--accent-earth);
 }
 
 .sidebar-footer {
@@ -145,14 +241,17 @@ h3 { font-size: 20px; }
     text-align: center;
 }
 
-/* MAIN CONTENT */
+
 .main-content {
     margin-left: 280px;
     min-height: 100vh;
     padding: 40px 48px;
+    width: calc(100% - 280px);
+    max-width: calc(100% - 280px);
+    overflow-x: hidden;
 }
 
-/* BOUTONS */
+
 .btn-primary {
     background: var(--accent-herb);
     color: white;
@@ -223,7 +322,7 @@ h3 { font-size: 20px; }
     color: #C55A4A;
 }
 
-/* FORMULAIRES */
+
 .form-card {
     max-width: 700px;
     width: 100%;
@@ -315,7 +414,7 @@ textarea.form-control {
     margin-top: 5px;
 }
 
-/* TABLEAUX */
+
 .table-card {
     background: var(--bg-elevated);
     border: 1px solid var(--border-light);
@@ -407,7 +506,7 @@ tr:hover {
     border-radius: var(--radius-sm);
 }
 
-/* BADGES */
+
 .badge {
     display: inline-flex;
     align-items: center;
@@ -428,7 +527,7 @@ tr:hover {
     color: #3A6B8C;
 }
 
-/* STATS */
+
 .stats-row {
     display: flex;
     gap: 20px;
@@ -466,7 +565,7 @@ tr:hover {
     color: var(--accent-herb);
 }
 
-/* WIDGETS */
+
 .eco-widget {
     background: var(--accent-earth-light);
     border-radius: 20px;
@@ -495,7 +594,7 @@ tr:hover {
     opacity: 0.9;
 }
 
-/* ANIMATIONS */
+
 @keyframes fadeSlide {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -586,7 +685,7 @@ tr:hover {
 .toast-notification.error { background-color: #C55A4A; }
 .toast-notification.info { background-color: #3A6B8C; }
 
-/* FOOTER */
+
 .main-footer {
     margin-left: 280px;
     padding: 24px 48px;
@@ -596,7 +695,7 @@ tr:hover {
     text-align: center;
 }
 
-/* UTILITAIRES */
+
 .text-center { text-align: center; }
 .text-muted { color: var(--text-muted); }
 .text-success { color: var(--accent-herb); }
@@ -609,11 +708,15 @@ tr:hover {
     box-shadow: var(--shadow-md);
 }
 
-/* RESPONSIVE */
+
 @media (max-width: 768px) {
     .sidebar { width: 72px; }
-    .sidebar-header h3, .sidebar-header .tagline, .sidebar-nav a span, .sidebar-footer { display: none; }
-    .sidebar-nav a { justify-content: center; padding: 12px; }
+    .sidebar-header h3, .sidebar-header .tagline, .sidebar-nav a span, .sidebar-group-toggle span span, .sidebar-chevron, .sidebar-footer { display: none; }
+    .sidebar-nav { padding-left: 10px; padding-right: 10px; }
+    .sidebar-nav a, .sidebar-group-toggle { justify-content: center; padding: 12px; }
+    .sidebar-group-toggle > span { gap: 0; }
+    .sidebar-subnav { padding-left: 0; }
+    .sidebar-subnav a::before { display: none; }
     .main-content, .main-footer { margin-left: 72px; padding: 24px; }
     .stats-row { flex-direction: column; }
     .btn-icon span { display: none; }

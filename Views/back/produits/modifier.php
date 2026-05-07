@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../controllers/ProduitController.php';
+require_once __DIR__ . '/../../../controllers/WishlistController.php';
 
 $controller = new ProduitController();
 $errors = [];
@@ -22,8 +23,10 @@ if (!$product) {
 $values = [
     'nom' => $product['nom'],
     'prix' => $product['prix'],
+    'promo_prix' => $product['promo_prix'] ?? '',
     'description' => $product['description'],
     'stock' => $product['stock'],
+    'coming_soon' => (string)($product['coming_soon'] ?? 0),
     'categorie' => $product['categorie'],
     'image_url' => $product['image_url'],
 ];
@@ -35,12 +38,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['prix'])) {
         $values['prix'] = $_POST['prix'];
     }
+    if (isset($_POST['promo_prix'])) {
+        $values['promo_prix'] = $_POST['promo_prix'];
+    }
     if (isset($_POST['description'])) {
         $values['description'] = trim($_POST['description']);
     }
     if (isset($_POST['stock'])) {
         $values['stock'] = $_POST['stock'];
     }
+    $values['coming_soon'] = isset($_POST['coming_soon']) ? '1' : '0';
     if (isset($_POST['categorie'])) {
         $values['categorie'] = $_POST['categorie'];
     }
@@ -55,18 +62,36 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    if(empty($errors)) {
+    if (empty($errors)) {
         $produit = new Produit(
             $values['nom'],
             floatval($values['prix']),
             $values['description'],
             intval($values['stock']),
             $values['categorie'],
-            $values['image_url']
+            $values['image_url'],
+            $values['promo_prix'] !== '' ? floatval($values['promo_prix']) : null,
+            intval($values['coming_soon'])
         );
 
         if($controller->update($id, $produit)) {
-            header('Location: liste.php?updated=1');
+            $newStock = (int)$values['stock'];
+            $notifyResult = ['sent' => 0, 'failed' => 0, 'total' => 0];
+
+            if ($newStock > 0) {
+                $wishlistController = new WishlistController();
+                $updatedProduct = $controller->getById($id);
+                if ($updatedProduct) {
+                    $notifyResult = $wishlistController->notifyProductAvailable($updatedProduct);
+                }
+            }
+
+            $notificationQuery = '';
+            if ($notifyResult['total'] > 0) {
+                $notificationQuery = '&wishlist_total=' . (int)$notifyResult['total'] . '&wishlist_sent=' . (int)$notifyResult['sent'] . '&wishlist_failed=' . (int)$notifyResult['failed'];
+            }
+
+            header('Location: liste.php?updated=1' . $notificationQuery);
             exit();
         }
 
@@ -98,21 +123,43 @@ require_once __DIR__ . '/../../partials/header.php';
 
             <div class="form-group">
                 <label for="prix">Prix (€)</label>
-                <input type="number" step="0.01" name="prix" id="prix" class="form-control" placeholder="49.99" value="<?php echo htmlspecialchars($values['prix']); ?>">
+                <input type="text" name="prix" id="prix" class="form-control" placeholder="49.99" inputmode="decimal" value="<?php echo htmlspecialchars($values['prix']); ?>">
                 <div id="prixError" class="error-message"><?php if (isset($errors['prix'])) { echo $errors['prix']; } ?></div>
             </div>
 
             <div class="form-group">
+                <label for="promo_prix">Prix promo (€)</label>
+                <input type="text" name="promo_prix" id="promo_prix" class="form-control" placeholder="Ex: 7.99" inputmode="decimal" value="<?php echo htmlspecialchars($values['promo_prix']); ?>">
+                <div class="hint">Laissez vide pour retirer la promotion. Le prix promo doit etre inferieur au prix actuel.</div>
+                <div id="promoPrixError" class="error-message"><?php if (isset($errors['promo_prix'])) { echo $errors['promo_prix']; } ?></div>
+            </div>
+
+            <div class="form-group">
                 <label for="description">Description</label>
-                <textarea name="description" id="description" class="form-control" rows="3" placeholder="Description du produit..."><?php echo htmlspecialchars($values['description']); ?></textarea>
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    <textarea name="description" id="description" class="form-control" rows="3" placeholder="Description du produit..."><?php echo htmlspecialchars($values['description']); ?></textarea>
+                    <button type="button" id="generateDescriptionBtn" class="btn-secondary" style="white-space: nowrap;">
+                        <i class="fas fa-wand-magic-sparkles"></i> Generer
+                    </button>
+                </div>
                 <div class="hint">Décrivez les bénéfices clairs du produit.</div>
+                <div id="descriptionAiStatus" class="hint" style="display: none;"></div>
                 <div class="error-message"><?php if (isset($errors['description'])) { echo $errors['description']; } ?></div>
             </div>
 
             <div class="form-group">
                 <label for="stock">Stock</label>
-                <input type="number" name="stock" id="stock" class="form-control" value="<?php echo htmlspecialchars($values['stock']); ?>">
+                <input type="text" name="stock" id="stock" class="form-control" inputmode="numeric" value="<?php echo htmlspecialchars($values['stock']); ?>">
                 <div id="stockError" class="error-message"><?php if (isset($errors['stock'])) { echo $errors['stock']; } ?></div>
+            </div>
+
+            <div class="form-group">
+                <label style="display:flex; align-items:center; gap:8px;">
+                    <input type="checkbox" name="coming_soon" value="1"<?php echo $values['coming_soon'] === '1' ? ' checked' : ''; ?>>
+                    Coming soon / disponible en pre-commande
+                </label>
+                <div class="hint">Decochez quand le produit est officiellement disponible.</div>
+                <div class="error-message"><?php if (isset($errors['coming_soon'])) { echo $errors['coming_soon']; } ?></div>
             </div>
 
             <div class="form-group">
@@ -159,5 +206,113 @@ require_once __DIR__ . '/../../partials/header.php';
         </form>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const generateBtn = document.getElementById('generateDescriptionBtn');
+    const nameInput = document.getElementById('nom');
+    const categoryInput = document.getElementById('categorie');
+    const descriptionInput = document.getElementById('description');
+    const aiStatus = document.getElementById('descriptionAiStatus');
+    const priceInput = document.getElementById('prix');
+    const promoPriceInput = document.getElementById('promo_prix');
+    const stockInput = document.getElementById('stock');
+    const promoPriceError = document.getElementById('promoPrixError');
+
+    function validatePromoPrice() {
+        if (!priceInput || !promoPriceInput || !promoPriceError) {
+            return true;
+        }
+
+        const price = parseFloat(String(priceInput.value).replace(',', '.'));
+        const promoPrice = parseFloat(String(promoPriceInput.value).replace(',', '.'));
+
+        if (!promoPriceInput.value.trim()) {
+            promoPriceError.textContent = '';
+            return true;
+        }
+
+        if (Number.isNaN(promoPrice) || promoPrice <= 0) {
+            promoPriceError.textContent = 'Le prix promo doit etre un nombre positif.';
+            return false;
+        }
+
+        if (!Number.isNaN(price) && promoPrice >= price) {
+            promoPriceError.textContent = 'Le prix promo doit etre inferieur au prix actuel.';
+            return false;
+        }
+
+        promoPriceError.textContent = '';
+        return true;
+    }
+
+    if (priceInput && promoPriceInput) {
+        priceInput.addEventListener('input', validatePromoPrice);
+        promoPriceInput.addEventListener('input', validatePromoPrice);
+        document.getElementById('productForm').addEventListener('submit', function (event) {
+            if (!validatePromoPrice()) {
+                event.preventDefault();
+                promoPriceInput.focus();
+            }
+        });
+    }
+
+    if (generateBtn && nameInput && descriptionInput && aiStatus) {
+        generateBtn.addEventListener('click', async function () {
+            const productName = nameInput.value.trim();
+
+            if (!productName) {
+                aiStatus.style.display = 'flex';
+                aiStatus.style.color = '#C55A4A';
+                aiStatus.textContent = 'Veuillez entrer le nom du produit avant de generer une description.';
+                nameInput.focus();
+                return;
+            }
+
+            const originalText = generateBtn.innerHTML;
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<span class="loading-spinner-custom"></span> Generation...';
+            aiStatus.style.display = 'flex';
+            aiStatus.style.color = 'var(--text-muted)';
+            aiStatus.textContent = 'Generation de la description avec IA...';
+
+            try {
+                const formData = new FormData();
+                formData.append('name', productName);
+                formData.append('category', categoryInput ? categoryInput.value : '');
+                formData.append('price', priceInput ? priceInput.value : '');
+                formData.append('promo_price', promoPriceInput ? promoPriceInput.value : '');
+                formData.append('stock', stockInput ? stockInput.value : '');
+                formData.append('current_description', descriptionInput ? descriptionInput.value : '');
+
+                const response = await fetch('../../../Controllers/ProductDescriptionAI.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.message || 'Impossible de generer la description.');
+                }
+
+                descriptionInput.value = data.description;
+                if (data.source === 'gemini') {
+                    aiStatus.style.color = 'var(--accent-herb)';
+                    aiStatus.textContent = 'Description generee avec Gemini.';
+                } else {
+                    aiStatus.style.color = '#B0873A';
+                    aiStatus.textContent = 'Description generee en fallback local' + (data.ai_error ? ' (' + data.ai_error + ')' : '') + '.';
+                }
+            } catch (error) {
+                aiStatus.style.color = '#C55A4A';
+                aiStatus.textContent = error.message;
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = originalText;
+            }
+        });
+    }
+});
+</script>
 
 <?php require_once __DIR__ . '/../../partials/footer.php'; ?>

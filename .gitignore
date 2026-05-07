@@ -1,0 +1,59 @@
+# Environment & Configuration
+.env
+.env.local
+.env.*.local
+config/database.php.local
+config/stripe.local.php
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+storage/mail_logs/*
+storage/promo_texts/*
+!storage/mail_logs/.gitkeep
+!storage/promo_texts/.gitkeep
+
+# Temporary Files
+tmp/
+temp/
+cache/
+
+# Composer
+vendor/
+composer.lock
+
+# Node (if using npm/webpack)
+node_modules/
+npm-debug.log
+dist/
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+*.swo
+
+# Build artifacts
+build/dist/
+dist/
+
+# Database backups
+*.sql
+*.sql.gz
+
+# Sensitive files
+secrets.php
+credentials.php
+
+# Test output
+coverage/
+.phpunit.result.cache

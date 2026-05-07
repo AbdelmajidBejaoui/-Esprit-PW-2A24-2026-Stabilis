@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Report - Stabilis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        body {
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1A4D3A 0%, #3A6B4B 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+            border-bottom: 5px solid #C6A15B;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h1 {
+            font-size: 38px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .header .subtitle {
+            font-size: 15px;
+            opacity: 0.95;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        
+        .header .date {
+            font-size: 12px;
+            opacity: 0.85;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+        
+        .section {
+            padding: 40px;
+            border-bottom: 2px solid #E8F0E9;
+            page-break-inside: avoid;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(90deg, #1A4D3A 0%, #3A6B4B 100%);
+            padding: 12px 16px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            border-left: 5px solid #C6A15B;
+            display: inline-block;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #E8F0E9 0%, #F5F9F6 100%);
+            border-left: 5px solid #3A6B4B;
+            border-top: 1px solid #3A6B4B;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(26, 77, 58, 0.1);
+            transition: transform 0.3s ease;
+            page-break-inside: avoid;
+        }
+        
+        .metric-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #1A4D3A;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1A4D3A;
+            line-height: 1;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 13px;
+            page-break-inside: avoid;
+        }
+        
+        thead {
+            background: linear-gradient(90deg, #1A4D3A 0%, #3A6B4B 100%);
+        }
+        
+        th {
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: white;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #E8F0E9;
+            color: #333;
+        }
+        
+        tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        
+        tbody tr:nth-child(odd) {
+            background: #F9FAFB;
+        }
+        
+        tbody tr:nth-child(even) {
+            background: white;
+        }
+        
+        tbody tr:hover {
+            background: #E8F0E9;
+        }
+        
+        .accent {
+            color: #C6A15B;
+            font-weight: 700;
+        }
+        
+        .status-confirmee {
+            color: #3A6B4B;
+            font-weight: 600;
+        }
+        
+        .status-annulee {
+            color: #c55a4a;
+            font-weight: 600;
+        }
+        
+        .status-attente {
+            color: #C6A15B;
+            font-weight: 600;
+        }
+        
+        .footer {
+            background: linear-gradient(90deg, #1A4D3A 0%, #3A6B4B 100%);
+            color: white;
+            padding: 25px 40px;
+            text-align: center;
+            font-size: 11px;
+            border-top: 5px solid #C6A15B;
+        }
+        
+        .footer strong {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+                padding: 30px;
+            }
+            
+            table {
+                page-break-inside: avoid;
+            }
+            
+            thead {
+                display: table-header-group;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>Stabilis Dashboard Report</h1>
+                <div class="subtitle">Complete Business Analysis</div>
+                <div class="date">Generated on 02/05/2026 20:17</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Key Metrics Overview</div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Total Products</div>
+                    <div class="metric-value">5</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Total Stock</div>
+                    <div class="metric-value">380</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Total Orders</div>
+                    <div class="metric-value">10</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Revenue</div>
+                    <div class="metric-value"><span class="accent">€0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Top Products Performance</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Units Sold</th>
+                        <th>Revenue</th>
+                    </tr>
+                </thead>
+                <tbody><tr>
+                        <td><strong>Barre Protéiné</strong></td>
+                        <td>4</td>
+                        <td class="accent">€0,00</td>
+                    </tr><tr>
+                        <td><strong>Multivitamines Sport</strong></td>
+                        <td>3</td>
+                        <td class="accent">€0,00</td>
+                    </tr><tr>
+                        <td><strong>Granula Bar</strong></td>
+                        <td>1</td>
+                        <td class="accent">€0,00</td>
+                    </tr><tr>
+                        <td><strong>Wheyy</strong></td>
+                        <td>1</td>
+                        <td class="accent">€0,00</td>
+                    </tr><tr>
+                        <td><strong>Whey Protein Isolat</strong></td>
+                        <td>1</td>
+                        <td class="accent">€0,00</td>
+                    </tr></tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Top Customers</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer Email</th>
+                        <th>Orders Placed</th>
+                        <th>Total Spent</th>
+                    </tr>
+                </thead>
+                <tbody><tr>
+                        <td>abdelmajidbejaoui789@gmail.com</td>
+                        <td>3</td>
+                        <td class="accent">€0,00</td>
+                    </tr><tr>
+                        <td>bejaoui.abdelmajid@esprit.tn</td>
+                        <td>5</td>
+                        <td class="accent">€0,00</td>
+                    </tr><tr>
+                        <td>abdelmajidbejaoui777@gmail.com</td>
+                        <td>1</td>
+                        <td class="accent">€0,00</td>
+                    </tr><tr>
+                        <td>abdelmajidbejaoui351@gmail.com</td>
+                        <td>1</td>
+                        <td class="accent">€0,00</td>
+                    </tr></tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Sales by Category</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Revenue</th>
+                        <th>Share</th>
+                    </tr>
+                </thead>
+                <tbody><tr>
+                        <td><strong>Acides Aminés</strong></td>
+                        <td class="accent">€0,00</td>
+                        <td>0,0%</td>
+                    </tr><tr>
+                        <td><strong>Vitamines</strong></td>
+                        <td class="accent">€0,00</td>
+                        <td>0,0%</td>
+                    </tr><tr>
+                        <td><strong>Snacks</strong></td>
+                        <td class="accent">€0,00</td>
+                        <td>0,0%</td>
+                    </tr><tr>
+                        <td><strong>Protéines</strong></td>
+                        <td class="accent">€0,00</td>
+                        <td>0,0%</td>
+                    </tr></tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Recent Orders</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer Email</th>
+                        <th>Product</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody><tr>
+                        <td>abdelmajidbejaoui789@gmail.com</td>
+                        <td>Wheyy</td>
+                        <td class="accent">€0,00</td>
+                        <td><span class="status-en-attente">En attente</span></td>
+                    </tr><tr>
+                        <td>abdelmajidbejaoui789@gmail.com</td>
+                        <td>Multivitamines Sport</td>
+                        <td class="accent">€0,00</td>
+                        <td><span class="status-en-attente">En attente</span></td>
+                    </tr><tr>
+                        <td>abdelmajidbejaoui789@gmail.com</td>
+                        <td>Granula Bar</td>
+                        <td class="accent">€0,00</td>
+                        <td><span class="status-en-attente">En attente</span></td>
+                    </tr><tr>
+                        <td>abdelmajidbejaoui777@gmail.com</td>
+                        <td>Barre Protéiné</td>
+                        <td class="accent">€0,00</td>
+                        <td><span class="status-en-attente">En attente</span></td>
+                    </tr><tr>
+                        <td>bejaoui.abdelmajid@esprit.tn</td>
+                        <td>Whey Protein Isolat</td>
+                        <td class="accent">€0,00</td>
+                        <td><span class="status-validée">Validée</span></td>
+                    </tr><tr>
+                        <td>bejaoui.abdelmajid@esprit.tn</td>
+                        <td>Multivitamines Sport</td>
+                        <td class="accent">€0,00</td>
+                        <td><span class="status-validée">Validée</span></td>
+                    </tr><tr>
+                        <td>bejaoui.abdelmajid@esprit.tn</td>
+                        <td>Barre Protéiné</td>
+                        <td class="accent">€0,00</td>
+                        <td><span class="status-en-attente">En attente</span></td>
+                    </tr><tr>
+                        <td>bejaoui.abdelmajid@esprit.tn</td>
+                        <td>Multivitamines Sport</td>
+                        <td class="accent">€0,00</td>
+                        <td><span class="status-en-attente">En attente</span></td>
+                    </tr><tr>
+                        <td>bejaoui.abdelmajid@esprit.tn</td>
+                        <td>Barre Protéiné</td>
+                        <td class="accent">€0,00</td>
+                        <td><span class="status-en-attente">En attente</span></td>
+                    </tr><tr>
+                        <td>abdelmajidbejaoui351@gmail.com</td>
+                        <td>Barre Protéiné</td>
+                        <td class="accent">€0,00</td>
+                        <td><span class="status-expédiée">Expédiée</span></td>
+                    </tr></tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <strong>Stabilis - Professional Dashboard Report</strong>
+            Generated automatically at 02/05/2026 20:17<br>
+            All figures are as of report generation date • Print as PDF for archival
+        </div>
+    </div>
+    
+    <script>
+        // Auto-print on load (optional)
+        // window.print();
+    </script>
+</body>
+</html>

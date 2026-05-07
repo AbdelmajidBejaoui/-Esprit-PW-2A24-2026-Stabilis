@@ -1,6 +1,6 @@
-/* Front pages extracted styles (cart + index) */
 
-/* ===== Index page ===== */
+
+
 .hero-section {
     background: linear-gradient(135deg, var(--accent-herb) 0%, var(--accent-herb-dark) 100%);
     color: white;
@@ -184,7 +184,7 @@
 .bubble:nth-child(2) { width: 40px; height: 40px; top: 60%; right: 15%; }
 .bubble:nth-child(3) { width: 80px; height: 80px; bottom: 20%; left: 20%; }
 
-/* ===== Cart page ===== */
+
 body.page-cart {
     padding-top: 0;
     margin: 0;
@@ -433,7 +433,7 @@ body.page-cart {
     background: #FEF2F0;
 }
 
-/* Utility classes replacing previous inline styles */
+
 .u-inline-flex-cta {
     display: inline-flex;
     padding: 14px 32px;
@@ -451,6 +451,29 @@ body.page-cart {
 .u-cart-subtitle {
     color: var(--text-secondary);
     font-size: 16px;
+}
+
+.page-cart .u-cart-subtitle,
+.page-cart .empty-cart p,
+.page-cart .summary-row,
+.page-cart .continue-shopping,
+.page-order .summary-product-qty,
+.page-order .success-box p {
+    color: #465348;
+}
+
+.page-cart .item-title,
+.page-cart .item-total,
+.page-cart .summary-title,
+.page-order .summary-title,
+.page-order .summary-product-name {
+    color: var(--text-primary);
+}
+
+.page-cart .u-footer-subtitle,
+.page-cart .u-footer-meta {
+    color: rgba(255, 255, 255, 0.82);
+    opacity: 1;
 }
 .u-qty-form {
     display: flex;
@@ -485,7 +508,7 @@ body.page-cart {
     opacity: 0.6;
 }
 
-/* Index specific utility classes for replaced inline styles */
+
 .u-hero-cta {
     display: inline-flex;
     padding: 14px 32px;
@@ -516,7 +539,7 @@ body.page-cart {
     font-size: 16px;
 }
 
-/* ===== Checkout page ===== */
+
 .checkout-section {
     padding: 60px 0;
 }
@@ -794,7 +817,7 @@ body.page-cart {
     color: var(--text-primary);
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
     .cart-container {
         grid-template-columns: 1fr;
