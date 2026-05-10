@@ -1,0 +1,10 @@
+; Copy relevant lines into your local sendmail.ini
+; Typical location: C:\xampp\sendmail\sendmail.ini
+
+[sendmail]
+smtp_server=smtp.gmail.com
+smtp_port=587
+smtp_ssl=auto
+auth_username=YOUR_EMAIL@gmail.com
+auth_password=YOUR_APP_PASSWORD
+force_sender=YOUR_EMAIL@gmail.com

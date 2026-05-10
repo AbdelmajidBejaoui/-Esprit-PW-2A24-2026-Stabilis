@@ -1,0 +1,6 @@
+<?php
+// Copy this file to config_recaptcha.php and fill in your keys.
+return [
+    'site_key' => 'YOUR_SITE_KEY_HERE',
+    'secret' => 'YOUR_SECRET_KEY_HERE'
+];

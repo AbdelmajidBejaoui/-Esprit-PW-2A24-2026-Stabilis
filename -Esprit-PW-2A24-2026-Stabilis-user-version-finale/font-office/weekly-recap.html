@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recap hebdomadaire - Stabilis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2E7D32;
+            --secondary: #FF9800;
+            --accent: #2196F3;
+            --gold: #FFD700;
+            --silver: #C0C0C0;
+            --bronze: #CD7F32;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        .slideshow-container {
+            width: 100%;
+            max-width: 1200px;
+            height: 700px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease-in-out, transform 0.8s ease-out;
+            transform: scale(0.95);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+
+        .recap-home-link {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            z-index: 120;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: 0;
+            padding: 11px 18px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
+            backdrop-filter: blur(10px);
+            transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+        }
+
+        .recap-home-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.45);
+            transform: translateY(-2px);
+        }
+
+        .recap-home-link i {
+            font-size: 0.95rem;
+        }
+
+        /* Slide 1: Title */
+        .title-slide h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titlePulse 2s ease-in-out infinite;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title-slide .subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+        }
+
+        .title-slide .week-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--secondary), #FF5722);
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            animation: badgeFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes badgeFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Slide 2: Top Gainer */
+        .gainer-card {
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.2), rgba(33, 150, 243, 0.2));
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            border: 2px solid rgba(46, 125, 50, 0.3);
+            animation: cardGlow 2s ease-in-out infinite;
+        }
+
+        .trophy-icon {
+            font-size: 5rem;
+            animation: trophyPulse 1.5s ease-in-out infinite;
+            display: inline-block;
+        }
+
+        @keyframes trophyPulse {
+            0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5)); }
+            50% { transform: scale(1.2) rotate(10deg); filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.8)); }
+        }
+
+        @keyframes cardGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(46, 125, 50, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(46, 125, 50, 0.6); }
+        }
+
+        .gainer-name {
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            margin: 20px 0;
+        }
+
+        .points-gained {
+            font-size: 2rem;
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        /* Slide 3: Most Active */
+        .active-card {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.2), rgba(255, 87, 34, 0.2));
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            border: 2px solid rgba(255, 152, 0, 0.3);
+        }
+
+        .fire-icon {
+            font-size: 5rem;
+            animation: fireBurn 1s ease-in-out infinite;
+        }
+
+        @keyframes fireBurn {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255, 87, 34, 0.5)); }
+            25% { transform: scale(1.1) translateY(-5px); filter: drop-shadow(0 0 20px rgba(255, 87, 34, 0.8)); }
+            50% { transform: scale(1.05) translateY(0); filter: drop-shadow(0 0 15px rgba(255, 87, 34, 0.6)); }
+            75% { transform: scale(1.15) translateY(-3px); filter: drop-shadow(0 0 25px rgba(255, 87, 34, 0.9)); }
+        }
+
+        .active-name {
+            font-size: 3rem;
+            font-weight: bold;
+            color: white;
+            margin: 20px 0;
+        }
+
+        .challenge-count {
+            font-size: 2rem;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        /* Slide 4: Top 3 */
+        .podium {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .podium-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: podiumRise 1s ease-out;
+        }
+
+        .podium-item:first-child { animation-delay: 0.2s; }
+        .podium-item:nth-child(2) { animation-delay: 0.4s; }
+        .podium-item:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes podiumRise {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .medal {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .medal.gold { 
+            animation: goldShine 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+        }
+        .medal.silver { 
+            animation: silverShine 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px rgba(192, 192, 192, 0.8));
+        }
+        .medal.bronze { 
+            animation: bronzeShine 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px rgba(205, 127, 50, 0.8));
+        }
+
+        @keyframes goldShine {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(15deg); }
+        }
+
+        @keyframes silverShine {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(-10deg); }
+        }
+
+        @keyframes bronzeShine {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.15) rotate(5deg); }
+        }
+
+        .podium-bar {
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .podium-bar.first {
+            height: 180px;
+            width: 120px;
+            background: linear-gradient(to top, var(--gold), #FFA000);
+        }
+
+        .podium-bar.second {
+            height: 130px;
+            width: 100px;
+            background: linear-gradient(to top, var(--silver), #9E9E9E);
+        }
+
+        .podium-bar.third {
+            height: 90px;
+            width: 90px;
+            background: linear-gradient(to top, var(--bronze), #8D6E63);
+        }
+
+        .podium-name {
+            margin-top: 10px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+        }
+
+        .podium-points {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Slide 5: Full Leaderboard */
+        .leaderboard-table {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .leaderboard-table thead th {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            border: none;
+        }
+
+        .leaderboard-table tbody tr {
+            opacity: 0;
+            transform: translateX(50px);
+            animation: slideInRow 0.6s ease-out forwards;
+            background: rgba(255, 255, 255, 0.03);
+            transition: background 0.3s;
+        }
+
+        .leaderboard-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .leaderboard-table tbody td {
+            padding: 15px;
+            color: white;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes slideInRow {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .rank-1 .rank-badge { background: linear-gradient(135deg, var(--gold), #FFA000); color: #000; }
+        .rank-2 .rank-badge { background: linear-gradient(135deg, var(--silver), #9E9E9E); color: #000; }
+        .rank-3 .rank-badge { background: linear-gradient(135deg, var(--bronze), #8D6E63); color: #fff; }
+
+        .points-cell {
+            font-weight: bold;
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+
+        /* Controls */
+        .controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .btn-control {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-control:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-control.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* Slide indicators */
+        .indicators {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s;
+        }
+
+        .indicator.active {
+            background: var(--primary);
+            transform: scale(1.3);
+            box-shadow: 0 0 10px rgba(46, 125, 50, 0.5);
+        }
+
+        /* Particles background */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: floatParticle linear infinite;
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .slideshow-container {
+                height: auto;
+                min-height: 500px;
+                margin: 20px;
+            }
+            .title-slide h1 { font-size: 2.5rem; }
+            .gainer-name, .active-name { font-size: 2rem; }
+            .podium { gap: 15px; }
+            .podium-bar.first { width: 80px; height: 130px; }
+            .podium-bar.second { width: 70px; height: 90px; }
+            .podium-bar.third { width: 60px; height: 60px; }
+            .recap-home-link {
+                top: 16px;
+                left: 16px;
+                padding: 10px 14px;
+                font-size: 0.9rem;
+            }
+            .indicators {
+                top: 24px;
+                right: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slideshow-container">
+        <!-- Particles Background -->
+        <div class="particles" id="particles"></div>
+
+        <a class="recap-home-link" href="index.php" aria-label="Retourner a l'accueil">
+            <i class="fas fa-arrow-left"></i>
+            <span>Accueil</span>
+        </a>
+
+        <!-- Slide Indicators -->
+        <div class="indicators">
+            <div class="indicator active" data-slide="0"></div>
+            <div class="indicator" data-slide="1"></div>
+            <div class="indicator" data-slide="2"></div>
+            <div class="indicator" data-slide="3"></div>
+            <div class="indicator" data-slide="4"></div>
+        </div>
+
+        <!-- Slide 1: Title -->
+        <div class="slide active" data-slide="0">
+            <div class="title-slide text-center">
+                <div class="week-badge">Semaine <span id="week-number">12</span></div>
+                <h1>Recap hebdomadaire</h1>
+                <p class="subtitle">Les progressions marquantes de la communaute Stabilis</p>
+                <div class="mt-5">
+                    <i class="fas fa-leaf text-success fa-3x me-4"></i>
+                    <i class="fas fa-trophy text-warning fa-3x"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Top Points Gainer -->
+        <div class="slide" data-slide="1">
+            <h2 class="text-white mb-5">Meilleure progression</h2>
+            <div class="gainer-card">
+                <div class="trophy-icon"><i class="fas fa-trophy text-warning"></i></div>
+                <div class="gainer-name" id="top-gainer-name">Chargement...</div>
+                <div class="points-gained">+<span id="top-gainer-points">0</span> points</div>
+                <p class="text-white-50 mt-3">Le meilleur gain de points cette semaine</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: Most Active Player -->
+        <div class="slide" data-slide="2">
+            <h2 class="text-white mb-5">Utilisateur le plus actif</h2>
+            <div class="active-card">
+                <div class="fire-icon"><i class="fas fa-bolt text-warning"></i></div>
+                <div class="active-name" id="most-active-name">Chargement...</div>
+                <div class="challenge-count"><span id="most-active-count">0</span> participation(s)</div>
+                <p class="text-white-50 mt-3">Le profil le plus engage dans les defis</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: Top 3 Podium -->
+        <div class="slide" data-slide="3">
+            <h2 class="text-white mb-4">Top 3</h2>
+            <div class="podium" id="podium-container">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Slide 5: Full Leaderboard -->
+        <div class="slide" data-slide="4">
+            <h2 class="text-white mb-4">Classement complet</h2>
+            <div class="leaderboard-table-container" style="max-height: 450px; overflow-y: auto;">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rang</th>
+                            <th>Utilisateur</th>
+                            <th>Participations</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="btn-control" id="btn-pause" onclick="togglePause()">
+                <i class="fas fa-pause me-2"></i>Pause
+            </button>
+            <button class="btn-control" onclick="nextSlide()">
+                <i class="fas fa-forward me-2"></i>Next
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const apiUrl = '../app/api/weekly-recap.php';
+        const emptyPlayer = { rank: 0, name: 'Aucune donnee', points: 0, challenges: 0, avatar: '--' };
+        const emptyWeeklyData = {
+            weekNumber: getWeekNumber(new Date()),
+            topGainer: emptyPlayer,
+            mostActive: emptyPlayer,
+            top3: [
+                { ...emptyPlayer, rank: 1, name: 'En attente' },
+                { ...emptyPlayer, rank: 2, name: 'En attente' },
+                { ...emptyPlayer, rank: 3, name: 'En attente' }
+            ],
+            fullLeaderboard: []
+        };
+        let weeklyData = emptyWeeklyData;
+
+        // ==========================================
+        // SLIDESHOW LOGIC
+        // ==========================================
+        let currentSlide = 0;
+        let isPaused = false;
+        let slideInterval;
+        let progressInterval;
+        const totalSlides = 5;
+        const slideDuration = 6000; // 6 seconds per slide
+        const progressIntervalTime = 50; // Update progress every 50ms
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchWeeklyData();
+            loadData();
+            createParticles();
+            startSlideshow();
+        });
+
+        async function fetchWeeklyData() {
+            try {
+                const response = await fetch(apiUrl, { cache: 'no-store' });
+                const payload = await response.json();
+
+                if (!response.ok || !payload.success || !payload.data) {
+                    throw new Error(payload.message || payload.error || 'Impossible de charger le recap');
+                }
+
+                weeklyData = normalizeWeeklyData(payload.data);
+            } catch (error) {
+                console.error('Impossible de charger le recap:', error);
+                weeklyData = emptyWeeklyData;
+            }
+        }
+
+        function normalizeWeeklyData(data) {
+            const top3 = Array.isArray(data.top3) ? data.top3.map(normalizePlayer) : [];
+            while (top3.length < 3) {
+                top3.push({ ...emptyPlayer, rank: top3.length + 1, name: 'En attente' });
+            }
+
+            return {
+                weekNumber: data.weekNumber || '',
+                topGainer: normalizePlayer(data.topGainer || emptyPlayer),
+                mostActive: normalizePlayer(data.mostActive || emptyPlayer),
+                top3,
+                fullLeaderboard: Array.isArray(data.fullLeaderboard) ? data.fullLeaderboard.map(normalizePlayer) : []
+            };
+        }
+
+        function normalizePlayer(player) {
+            const name = player.name || player.nom || 'Aucune donnee';
+            const points = Number(player.points ?? player.total_points ?? player.points_gained ?? 0);
+            const challenges = Number(player.challenges ?? player.challenges_completed ?? 0);
+
+            return {
+                rank: Number(player.rank || 0),
+                name,
+                points,
+                challenges,
+                avatar: player.avatar || name.slice(0, 2).toUpperCase()
+            };
+        }
+
+        function getWeekNumber(date) {
+            const target = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNumber = target.getUTCDay() || 7;
+            target.setUTCDate(target.getUTCDate() + 4 - dayNumber);
+            const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1));
+            return Math.ceil((((target - yearStart) / 86400000) + 1) / 7);
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function loadData() {
+            // Slide 1: Week number
+            document.getElementById('week-number').textContent = weeklyData.weekNumber;
+
+            // Slide 2: Top gainer
+            document.getElementById('top-gainer-name').textContent = weeklyData.topGainer.name;
+            document.getElementById('top-gainer-points').textContent = weeklyData.topGainer.points;
+
+            // Slide 3: Most active
+            document.getElementById('most-active-name').textContent = weeklyData.mostActive.name;
+            document.getElementById('most-active-count').textContent = weeklyData.mostActive.challenges;
+
+            // Slide 4: Podium
+            renderPodium();
+
+            // Slide 5: Full leaderboard
+            renderLeaderboard();
+        }
+
+        function renderPodium() {
+            const container = document.getElementById('podium-container');
+            const top3 = weeklyData.top3;
+            
+            // Order: 2nd, 1st, 3rd (for visual podium layout)
+            const order = [1, 0, 2];
+            
+            container.innerHTML = order.map(i => {
+                const player = top3[i];
+                const medals = ['1', '2', '3'];
+                const medalClasses = ['gold', 'silver', 'bronze'];
+                const barClasses = ['second', 'first', 'third'];
+                
+                return `
+                    <div class="podium-item">
+                        <div class="medal ${medalClasses[i]}">${medals[i]}</div>
+                        <div class="podium-name">${escapeHtml(player.name)}</div>
+                        <div class="podium-points">${player.points} pts</div>
+                        <div class="podium-bar ${barClasses[i]}">${i + 1}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderLeaderboard() {
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = '';
+
+            if (weeklyData.fullLeaderboard.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center text-white-50 py-4">
+                            Aucun classement disponible pour le moment
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            weeklyData.fullLeaderboard.forEach((player, index) => {
+                const row = document.createElement('tr');
+                row.style.animationDelay = `${index * 0.1}s`;
+                row.className = `rank-${Math.min(player.rank, 3)}`;
+                
+                row.innerHTML = `
+                    <td>
+                        <span class="rank-badge">${player.rank}</span>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-3" 
+                                 style="width: 40px; height: 40px; font-weight: bold; color: white;">
+                                ${escapeHtml(player.avatar)}
+                            </div>
+                            <span class="fw-bold">${escapeHtml(player.name)}</span>
+                        </div>
+                    </td>
+                    <td>${player.challenges}</td>
+                    <td class="points-cell">${player.points}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.animationDuration = `${8 + Math.random() * 12}s`;
+                particle.style.animationDelay = `${Math.random() * 10}s`;
+                particle.style.width = `${2 + Math.random() * 4}px`;
+                particle.style.height = particle.style.width;
+                container.appendChild(particle);
+            }
+        }
+
+        // ==========================================
+        // SLIDESHOW CONTROLS
+        // ==========================================
+        function startSlideshow() {
+            slideInterval = setInterval(() => {
+                if (!isPaused) {
+                    nextSlide();
+                }
+            }, slideDuration);
+
+            startProgress();
+        }
+
+        function startProgress() {
+            const progressBar = document.getElementById('progress-bar');
+            let progress = 0;
+            const increment = (progressIntervalTime / slideDuration) * 100;
+
+            progressInterval = setInterval(() => {
+                if (!isPaused) {
+                    progress += increment;
+                    if (progress >= 100) {
+                        progress = 0;
+                    }
+                    progressBar.style.width = `${progress}%`;
+                }
+            }, progressIntervalTime);
+        }
+
+        function nextSlide() {
+            const slides = document.querySelectorAll('.slide');
+            const indicators = document.querySelectorAll('.indicator');
+            
+            // Reset current slide
+            slides[currentSlide].classList.remove('active');
+            indicators[currentSlide].classList.remove('active');
+
+            // Reset progress bar
+            document.getElementById('progress-bar').style.width = '0%';
+
+            // Move to next slide
+            currentSlide = (currentSlide + 1) % totalSlides;
+
+            // Activate new slide
+            slides[currentSlide].classList.add('active');
+            indicators[currentSlide].classList.add('active');
+
+            // Re-trigger leaderboard animations when showing slide 5
+            if (currentSlide === 4) {
+                const rows = document.querySelectorAll('#leaderboard-body tr');
+                rows.forEach((row, index) => {
+                    row.style.animation = 'none';
+                    setTimeout(() => {
+                        row.style.animationDelay = `${index * 0.1}s`;
+                        row.style.animation = 'slideInRow 0.6s ease-out forwards';
+                    }, 10);
+                });
+            }
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            const btn = document.getElementById('btn-pause');
+            
+            if (isPaused) {
+                btn.innerHTML = '<i class="fas fa-play me-2"></i>Play';
+                btn.classList.add('active');
+            } else {
+                btn.innerHTML = '<i class="fas fa-pause me-2"></i>Pause';
+                btn.classList.remove('active');
+            }
+        }
+
+        // Click on indicators to jump to slide
+        document.querySelectorAll('.indicator').forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                const slides = document.querySelectorAll('.slide');
+                slides[currentSlide].classList.remove('active');
+                indicator.classList.remove('active');
+                
+                currentSlide = index;
+                slides[currentSlide].classList.add('active');
+                indicator.classList.add('active');
+                
+                // Reset progress
+                document.getElementById('progress-bar').style.width = '0%';
+            });
+        });
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'p' || e.key === 'P') {
+                togglePause();
+            }
+        });
+    </script>
+</body>
+</html>

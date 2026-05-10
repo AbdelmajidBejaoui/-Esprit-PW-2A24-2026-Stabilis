@@ -1,0 +1,9 @@
+.DS_Store
+Thumbs.db
+*.log
+/vendor/
+/node_modules/
+.env
+php.ini
+sendmail.ini
+config_recaptcha.php

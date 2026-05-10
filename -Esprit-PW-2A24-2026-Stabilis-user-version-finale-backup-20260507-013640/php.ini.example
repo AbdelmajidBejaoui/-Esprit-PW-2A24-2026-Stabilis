@@ -1,0 +1,7 @@
+; Copy relevant lines into your local php.ini
+; Typical location: C:\xampp\php\php.ini
+
+[mail function]
+SMTP=localhost
+smtp_port=25
+sendmail_path="\"C:\\xampp\\sendmail\\sendmail.exe\" -t"
