@@ -15,13 +15,13 @@ require_once __DIR__ . '/../../../partials/header.php';
 .user-admin-page .card {
     background: var(--bg-elevated);
     border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 12px 28px rgba(21, 63, 49, 0.08);
     overflow: hidden;
 }
 .user-admin-page .card-header,
 .user-admin-page .card-footer {
-    background: #fff;
+    background: linear-gradient(180deg, #FFFFFF 0%, #FBFDFB 100%);
     border-color: var(--border-light);
     padding: 18px 20px;
 }
@@ -87,9 +87,17 @@ require_once __DIR__ . '/../../../partials/header.php';
 }
 .user-admin-page .btn-primary,
 .user-admin-page .btn-success {
-    background: var(--accent-herb);
-    border-color: var(--accent-herb);
+    background: linear-gradient(135deg, var(--accent-herb-vivid), var(--accent-herb-dark));
+    border-color: transparent;
     color: #fff;
+    box-shadow: 0 10px 20px rgba(18, 95, 68, 0.12);
+}
+.user-admin-page .btn-primary:hover,
+.user-admin-page .btn-success:hover {
+    background: linear-gradient(135deg, var(--accent-mint), var(--accent-herb-dark));
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 14px 26px rgba(18, 95, 68, 0.18);
 }
 .user-admin-page .btn-danger {
     background: #B94A48;
@@ -108,8 +116,16 @@ require_once __DIR__ . '/../../../partials/header.php';
 }
 .user-admin-page .btn-default,
 .user-admin-page .btn-outline-secondary {
-    background: #fff;
-    border-color: var(--border-light);
+    background: var(--accent-herb-light);
+    border-color: var(--accent-herb-soft);
+    color: var(--accent-herb-dark);
+}
+.user-admin-page .btn-default:hover,
+.user-admin-page .btn-outline-secondary:hover {
+    background: #dcebdd;
+    border-color: var(--accent-herb);
+    color: var(--accent-herb-dark);
+    transform: translateY(-1px);
 }
 .user-admin-page .badge {
     display: inline-flex;
@@ -131,6 +147,7 @@ require_once __DIR__ . '/../../../partials/header.php';
     gap: 6px;
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 .user-admin-page .page-link {
     display: inline-flex;
@@ -142,10 +159,19 @@ require_once __DIR__ . '/../../../partials/header.php';
     border-radius: 10px;
     color: var(--text-primary);
     text-decoration: none;
+    background: #fff;
+    font-weight: 700;
 }
 .user-admin-page .page-item.active .page-link {
     background: var(--accent-herb);
+    border-color: var(--accent-herb);
     color: #fff;
+}
+.user-admin-page .page-item.disabled .page-link {
+    background: #f8faf8;
+    color: #8a928b;
+    border-color: #e5ebe6;
+    pointer-events: none;
 }
 .user-admin-page .d-flex { display: flex; }
 .user-admin-page .justify-content-between { justify-content: space-between; }
@@ -176,7 +202,7 @@ require_once __DIR__ . '/../../../partials/header.php';
 
 .user-admin-page .users-list-search .input-group {
     display: flex;
-    width: 330px;
+    width: 420px;
 }
 
 .user-admin-page .users-list-search .form-control {
@@ -198,12 +224,56 @@ require_once __DIR__ . '/../../../partials/header.php';
     border-radius: 0 4px 4px 0;
 }
 
+.user-admin-page .users-list-search .btn-default {
+    background: #fff;
+    border: 1px solid var(--border-light);
+    border-left: 0;
+    color: var(--text-primary);
+    box-shadow: none;
+}
+
+.user-admin-page .users-list-search .btn-default:hover {
+    background: #f7faf8;
+    color: var(--accent-herb-dark);
+}
+
+.user-admin-page .users-list-search .btn-outline-secondary {
+    border-radius: 4px;
+    margin-left: 6px;
+}
+
 .user-admin-page .users-list-main-btn {
     min-height: 38px;
     height: 38px;
     border-radius: 12px;
     padding: 8px 14px;
     white-space: nowrap;
+}
+
+.user-admin-page .users-list-actions .users-list-main-btn.btn-primary {
+    background: var(--accent-herb);
+    border-color: var(--accent-herb);
+    color: #fff;
+    box-shadow: none;
+}
+
+.user-admin-page .users-list-actions .users-list-main-btn.btn-primary:hover {
+    background: var(--accent-herb-dark);
+    border-color: var(--accent-herb-dark);
+    color: #fff;
+}
+
+.user-admin-page .users-list-actions .users-list-main-btn.btn-danger {
+    background: #d94154;
+    border-color: #d94154;
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(185, 74, 72, 0.16);
+}
+
+.user-admin-page .users-list-actions .users-list-main-btn.btn-danger:hover {
+    background: #c43143;
+    border-color: #c43143;
+    color: #fff;
 }
 
 .user-admin-page .users-list-row-actions {

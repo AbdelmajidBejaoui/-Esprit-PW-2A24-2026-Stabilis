@@ -13,6 +13,7 @@ function sidebar_is_active($paths) {
 
 $dashboardOpen = sidebar_is_active([
     '/AdminLTE3/Views/back/dashboard.php',
+    '/AdminLTE3/Views/back/dashboard-defis.php',
     '/AdminLTE3/Views/back/users/statistics.php'
 ]);
 $commandesOpen = sidebar_is_active([
@@ -26,6 +27,10 @@ $produitsOpen = sidebar_is_active([
     '/AdminLTE3/Views/back/produits/ajout.php',
     '/AdminLTE3/Views/back/produits/modifier.php',
     '/AdminLTE3/Views/back/packs/ajout.php'
+]);
+$defisOpen = sidebar_is_active([
+    '/AdminLTE3/Views/back/defis/',
+    '/AdminLTE3/Views/back/participations/'
 ]);
 $eventsActive = sidebar_is_active('/AdminLTE3/Views/back/evenements/index.php');
 $usersActive = sidebar_is_active('/AdminLTE3/Views/back/users/');
@@ -42,7 +47,7 @@ $usersActive = sidebar_is_active('/AdminLTE3/Views/back/users/');
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/AdminLTE3/assets/css/stabilis.css?v=4">
+    <link rel="stylesheet" href="/AdminLTE3/assets/css/stabilis.css?v=6">
     <link rel="stylesheet" href="/AdminLTE3/assets/css/back-style.css?v=4">
 </head>
 <body>
@@ -61,6 +66,7 @@ $usersActive = sidebar_is_active('/AdminLTE3/Views/back/users/');
             </button>
             <ul class="sidebar-subnav">
                 <li><a href="/AdminLTE3/Views/back/dashboard.php" class="<?php echo sidebar_is_active('/AdminLTE3/Views/back/dashboard.php') ? 'active' : ''; ?>"><i class="fas fa-store"></i> <span>E-commerce</span></a></li>
+                <li><a href="/AdminLTE3/Views/back/dashboard-defis.php" class="<?php echo sidebar_is_active('/AdminLTE3/Views/back/dashboard-defis.php') ? 'active' : ''; ?>"><i class="fas fa-trophy"></i> <span>Defis</span></a></li>
                 <li><a href="/AdminLTE3/Views/back/users/statistics.php" class="<?php echo sidebar_is_active('/AdminLTE3/Views/back/users/statistics.php') ? 'active' : ''; ?>"><i class="fas fa-users"></i> <span>Utilisateurs</span></a></li>
             </ul>
         </li>
@@ -86,6 +92,20 @@ $usersActive = sidebar_is_active('/AdminLTE3/Views/back/users/');
                 <li><a href="/AdminLTE3/Views/back/produits/liste.php" class="<?php echo sidebar_is_active(['/AdminLTE3/Views/back/produits/liste.php', '/AdminLTE3/Views/back/produits/modifier.php']) ? 'active' : ''; ?>"><i class="fas fa-box"></i> <span>Catalogue</span></a></li>
                 <li><a href="/AdminLTE3/Views/back/produits/ajout.php" class="<?php echo sidebar_is_active('/AdminLTE3/Views/back/produits/ajout.php') ? 'active' : ''; ?>"><i class="fas fa-plus"></i> <span>Nouveau produit</span></a></li>
                 <li><a href="/AdminLTE3/Views/back/packs/ajout.php" class="<?php echo sidebar_is_active('/AdminLTE3/Views/back/packs/ajout.php') ? 'active' : ''; ?>"><i class="fas fa-boxes-stacked"></i> <span>Nouveau pack</span></a></li>
+            </ul>
+        </li>
+
+        <li class="sidebar-group <?php echo $defisOpen ? 'is-open' : ''; ?>" data-sidebar-group="defis">
+            <button type="button" class="sidebar-group-toggle <?php echo $defisOpen ? 'active' : ''; ?>" aria-expanded="<?php echo $defisOpen ? 'true' : 'false'; ?>">
+                <span><i class="fas fa-trophy"></i> <span>Defis</span></span>
+                <i class="fas fa-chevron-down sidebar-chevron"></i>
+            </button>
+            <ul class="sidebar-subnav">
+                <li><a href="/AdminLTE3/Views/back/defis/liste.php" class="<?php echo sidebar_is_active(['/AdminLTE3/Views/back/defis/liste.php', '/AdminLTE3/Views/back/defis/modifier.php', '/AdminLTE3/Views/back/defis/supprimer.php']) ? 'active' : ''; ?>"><i class="fas fa-list"></i> <span>Tous les defis</span></a></li>
+                <li><a href="/AdminLTE3/Views/back/defis/ajout.php" class="<?php echo sidebar_is_active('/AdminLTE3/Views/back/defis/ajout.php') ? 'active' : ''; ?>"><i class="fas fa-plus"></i> <span>Nouveau defi</span></a></li>
+                <li><a href="/AdminLTE3/Views/back/defis/generer.php" class="<?php echo sidebar_is_active('/AdminLTE3/Views/back/defis/generer.php') ? 'active' : ''; ?>"><i class="fas fa-robot"></i> <span>Generation IA</span></a></li>
+                <li><a href="/AdminLTE3/Views/back/defis/recit-ia.php" class="<?php echo sidebar_is_active('/AdminLTE3/Views/back/defis/recit-ia.php') ? 'active' : ''; ?>"><i class="fas fa-feather-pointed"></i> <span>Recit IA</span></a></li>
+                <li><a href="/AdminLTE3/Views/back/participations/liste.php" class="<?php echo sidebar_is_active('/AdminLTE3/Views/back/participations/') ? 'active' : ''; ?>"><i class="fas fa-users"></i> <span>Participations</span></a></li>
             </ul>
         </li>
 

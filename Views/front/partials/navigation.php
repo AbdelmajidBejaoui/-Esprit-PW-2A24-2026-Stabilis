@@ -41,6 +41,7 @@ if (!function_exists('stabilis_front_nav_active')) {
         <ul class="navbar-nav">
             <li><a href="/AdminLTE3/Views/front/index.php" class="<?php echo stabilis_front_nav_active('home', ['/Views/front/index.php'], $activeFrontPage, $currentPath); ?>">Accueil</a></li>
             <li><a href="/AdminLTE3/Views/front/shop.php" class="<?php echo stabilis_front_nav_active('shop', ['/Views/front/shop.php', '/Views/front/product.php', '/Views/front/pack.php', '/Views/front/preorder.php', '/Views/front/preorder_pack.php'], $activeFrontPage, $currentPath); ?>">Boutique</a></li>
+            <li><a href="/AdminLTE3/Views/front/defis/index.php" class="<?php echo stabilis_front_nav_active('defis', ['/Views/front/defis/'], $activeFrontPage, $currentPath); ?>">Defis</a></li>
             <li>
                 <a href="/AdminLTE3/Views/front/cart.php" class="cart-nav-link<?php echo stabilis_front_nav_active('cart', ['/Views/front/cart.php', '/Views/front/order.php'], $activeFrontPage, $currentPath); ?>">
                     <i class="fas fa-shopping-cart"></i>

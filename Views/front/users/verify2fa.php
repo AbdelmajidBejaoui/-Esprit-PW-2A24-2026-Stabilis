@@ -71,6 +71,15 @@ require_once __DIR__ . '/partials/layout_top.php';
 
                 <p>Un code de verification a ete envoye a <?php echo htmlspecialchars($email); ?>. Il est valable 5 minutes.</p>
 
+                <?php if (isset($_SESSION['debug_2fa_code'])): ?>
+                    <div class="alert alert-info" style="background-color: #e3f2fd; border: 1px solid #90caf9; color: #1565c0; margin-bottom: 15px;">
+                        <strong>🔧 Mode Developpement:</strong><br>
+                        Votre code 2FA est: <code style="background: #fff; padding: 5px 10px; border-radius: 3px; font-weight: bold; font-size: 16px;"><?php echo htmlspecialchars($_SESSION['debug_2fa_code']); ?></code>
+                        <br><small>(Code affiché pour les tests uniquement)</small>
+                    </div>
+                    <?php unset($_SESSION['debug_2fa_code']); // Clear after displaying ?>
+                <?php endif; ?>
+
                 <form method="POST" action="">
                     <div class="form-group">
                         <label>Code</label>

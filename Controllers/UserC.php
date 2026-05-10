@@ -153,13 +153,13 @@ class UserC
 
     public function insertUser($user)
     {
-        $sql = 'INSERT INTO `user` (nom, email, password, role, preference_alimentaire, date_inscription, statut_compte, face_image, face_descriptor)
-            VALUES (:nom, :email, :password, :role, :preference_alimentaire, :date_inscription, :statut_compte, :face_image, :face_descriptor)';
         $db = Database::getConnection();
 
         try {
-            $query = $db->prepare($sql);
-            $query->execute([
+            // Check if face_image and face_descriptor columns exist
+            $columns = ['nom', 'email', 'password', 'role', 'preference_alimentaire', 'date_inscription', 'statut_compte'];
+            $placeholders = [':nom', ':email', ':password', ':role', ':preference_alimentaire', ':date_inscription', ':statut_compte'];
+            $data = [
                 'nom' => $user->getNom(),
                 'email' => $user->getEmail(),
                 'password' => password_hash($user->getPassword(), PASSWORD_DEFAULT),
@@ -167,9 +167,25 @@ class UserC
                 'preference_alimentaire' => $user->getPreferenceAlimentaire(),
                 'date_inscription' => $user->getDateInscription(),
                 'statut_compte' => $user->getStatutCompte(),
-                'face_image' => $user->getFaceImage(),
-                'face_descriptor' => $user->getFaceDescriptor()
-            ]);
+            ];
+
+            // Try to add face columns if values exist
+            if ($user->getFaceImage() !== null) {
+                $columns[] = 'face_image';
+                $placeholders[] = ':face_image';
+                $data['face_image'] = $user->getFaceImage();
+            }
+            if ($user->getFaceDescriptor() !== null) {
+                $columns[] = 'face_descriptor';
+                $placeholders[] = ':face_descriptor';
+                $data['face_descriptor'] = $user->getFaceDescriptor();
+            }
+
+            $sql = 'INSERT INTO `user` (' . implode(', ', $columns) . ')
+                    VALUES (' . implode(', ', $placeholders) . ')';
+
+            $query = $db->prepare($sql);
+            $query->execute($data);
             return (int)$db->lastInsertId();
         } catch (Exception $e) {
             die('Error: ' . $e->getMessage());
@@ -671,6 +687,9 @@ class UserC
                 $mailConfig['from_email'] ?? 'stabilisatyourservice@gmail.com',
                 $mailConfig['from_name'] ?? 'Stabilis'
             );
+
+            // Store code in session for development purposes (can be displayed for testing)
+            $_SESSION['debug_2fa_code'] = (string)$code;
 
             return true;
         } catch (Exception $e) {
