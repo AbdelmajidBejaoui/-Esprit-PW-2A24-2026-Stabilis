@@ -1,0 +1,34 @@
+# Configuration sensible
+config.php
+
+# Fichiers IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+error_log
+
+# Fichiers temporaires
+tmp/
+temp/
+cache/
+
+# Node modules (si vous utilisez npm)
+node_modules/
+
+# Vendor (si vous utilisez Composer)
+vendor/
+
+# Fichiers de backup
+*.bak
+*.backup
+*.old
