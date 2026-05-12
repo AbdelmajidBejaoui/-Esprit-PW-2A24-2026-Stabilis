@@ -21,6 +21,7 @@ Our application empowers users to:
 - [Overview](#overview)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
 - [Contributors](#contributors)
 - [Academic Context](#academic-context)
 - [Getting Started](#getting-started)
@@ -88,6 +89,16 @@ The application is structured into 5 core modules, each powered by smart technol
 
 - PHP
 - MySQL
+
+## Architecture
+
+The project follows the **MVC architecture** to separate the application logic, user interface, and data management.
+
+- **Model:** Handles database interactions and business logic.
+- **View:** Displays the user interface using HTML, CSS, and JavaScript.
+- **Controller:** Processes user requests and connects the models with the views.
+
+This structure helps keep the code organized, maintainable, and easier to extend.
 
 ## Contributors
 
